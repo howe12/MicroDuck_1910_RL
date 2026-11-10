@@ -1,0 +1,3 @@
+sha256 822bf5b5f276575e634ab0de1f0deec04b214c2360e10bac436c5c98175d4ca0
+bytes 793776
+note: exported from the 64-env x 5-iter smoke checkpoint on the ESTIMATED (782.2 g) HD1910 model; pipeline validation only, not a policy

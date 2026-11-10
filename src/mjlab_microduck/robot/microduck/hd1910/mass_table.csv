@@ -1,0 +1,22 @@
+body,part_label,mass_g,com_mm,inertia_mode,inertia_kgm2,status,source,notes
+trunk_base,躯干壳体 + 电池 + 主控/扩展 PCB + 线束（推定）,,,scale,,baseline,unchanged: no servo on this body,沿用 XL330 版结构件质量（无舵机）
+yaw2roll,左髋 yaw→roll 支架 + 舵机（推定）,26.04,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+hip_l,左髋 roll 支架 + 轴承（推定）,9.19,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+upper_leg_left,左大腿 + 舵机 + 舵盘（推定）,51.21,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+leg,左小腿 + 舵机（推定）,24.58,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+ankle_left,左踝/足 + 舵机 + 脚垫（推定）,33.02,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+neck,颈座 + 舵机（推定）,39.84,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+neck_pitch,颈俯仰摇臂 + 舵机（推定）,8.72,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+yaw_roll_motion,头部 yaw/roll 联动件 + 舵机（推定）,51.60,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+jaw_soft,头部上下壳 + 喙 + 镜头（推定）,194.77,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +6g；未实称
+bearing_roll,右髋 yaw→roll 支架 + 舵机（推定）,26.04,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+hip_l_2,右髋 roll 支架 + 轴承（推定）,9.19,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+upper_leg_right,右大腿 + 舵机 + 舵盘（推定）,51.21,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+leg_2,右小腿 + 舵机（推定）,24.58,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+ankle_right,右踝/足 + 舵机 + 脚垫（推定）,33.03,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+ankle_l_v1,左踝/足（轮滑版）+ 舵机（推定）,23.87,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+tire,滚动轮 1（轮滑版）,,,scale,,baseline,unchanged: no servo on this body,沿用 XL330 版结构件质量（无舵机）
+tire_2,滚动轮 2（轮滑版）,,,scale,,baseline,unchanged: no servo on this body,沿用 XL330 版结构件质量（无舵机）
+ankle_r_v1,右踝/足（轮滑版）+ 舵机（推定）,23.87,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
+tire_3,滚动轮 3（轮滑版）,,,scale,,baseline,unchanged: no servo on this body,沿用 XL330 版结构件质量（无舵机）
+tire_4,滚动轮 4（轮滑版）,,,scale,,baseline,unchanged: no servo on this body,沿用 XL330 版结构件质量（无舵机）

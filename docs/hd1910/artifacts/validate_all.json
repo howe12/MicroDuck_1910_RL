@@ -1,0 +1,155 @@
+[
+  {
+    "stage": "home",
+    "seconds": 3.0,
+    "trunk_z_mean_m": 0.1154,
+    "trunk_z_final_m": 0.1151,
+    "tilt_mean_deg": 4.95,
+    "tilt_max_deg": 6.09,
+    "max_joint_drift_rad": 0.0721,
+    "verdict": "stable"
+  },
+  {
+    "stage": "drift",
+    "seconds": 10.0,
+    "trunk_z_start_m": 0.118,
+    "trunk_z_end_m": -0.1047,
+    "trunk_z_delta_mm": -222.64,
+    "tilt_max_deg": 179.85,
+    "max_joint_creep_mrad": 57.05,
+    "mean_joint_creep_mrad": 22.68,
+    "fell_at_s": 6.04,
+    "verdict": "FELL at 6.0s"
+  },
+  {
+    "stage": "step",
+    "condition": "standing",
+    "amplitude_rad": 0.2,
+    "joints": [
+      {
+        "joint": "left_hip_yaw",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.14990000426769257,
+        "steady_state_error_rad": -0.05009999871253967,
+        "overshoot_pct": -25.0,
+        "rise_ms": null
+      },
+      {
+        "joint": "left_hip_roll",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.13030000030994415,
+        "steady_state_error_rad": -0.06970000267028809,
+        "overshoot_pct": -33.0,
+        "rise_ms": null
+      },
+      {
+        "joint": "left_hip_pitch",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.14650000631809235,
+        "steady_state_error_rad": -0.05350000038743019,
+        "overshoot_pct": -24.4,
+        "rise_ms": null
+      },
+      {
+        "joint": "left_knee",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.018200000748038292,
+        "steady_state_error_rad": -0.1817999929189682,
+        "overshoot_pct": 28.1,
+        "rise_ms": 360.0
+      },
+      {
+        "joint": "left_ankle",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.17589999735355377,
+        "steady_state_error_rad": -0.02410000003874302,
+        "overshoot_pct": 34.4,
+        "rise_ms": 600.0
+      },
+      {
+        "joint": "neck_pitch",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.2280000001192093,
+        "steady_state_error_rad": 0.02800000086426735,
+        "overshoot_pct": 14.1,
+        "rise_ms": 320.0
+      },
+      {
+        "joint": "head_pitch",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.2264000028371811,
+        "steady_state_error_rad": 0.026399999856948853,
+        "overshoot_pct": 13.2,
+        "rise_ms": 320.0
+      },
+      {
+        "joint": "head_yaw",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.16410000622272491,
+        "steady_state_error_rad": -0.03590000048279762,
+        "overshoot_pct": -17.9,
+        "rise_ms": null
+      },
+      {
+        "joint": "head_roll",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.1703999936580658,
+        "steady_state_error_rad": -0.029600000008940697,
+        "overshoot_pct": -14.8,
+        "rise_ms": null
+      },
+      {
+        "joint": "right_hip_yaw",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.17820000648498535,
+        "steady_state_error_rad": -0.021800000220537186,
+        "overshoot_pct": -10.8,
+        "rise_ms": null
+      },
+      {
+        "joint": "right_hip_roll",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.0640999972820282,
+        "steady_state_error_rad": -0.13590000569820404,
+        "overshoot_pct": -67.8,
+        "rise_ms": null
+      },
+      {
+        "joint": "right_hip_pitch",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.2070000022649765,
+        "steady_state_error_rad": 0.007000000216066837,
+        "overshoot_pct": 32.5,
+        "rise_ms": 540.0
+      },
+      {
+        "joint": "right_knee",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.05000000074505806,
+        "steady_state_error_rad": -0.15000000596046448,
+        "overshoot_pct": -74.7,
+        "rise_ms": null
+      },
+      {
+        "joint": "right_ankle",
+        "target_delta_rad": 0.2,
+        "final_delta_rad": 0.1534000039100647,
+        "steady_state_error_rad": -0.04659999907016754,
+        "overshoot_pct": 25.0,
+        "rise_ms": 420.0
+      }
+    ],
+    "worst_steady_state": "left_knee",
+    "worst_steady_state_error_rad": -0.1817999929189682
+  },
+  {
+    "stage": "walk",
+    "onnx": "/tmp/hd1910_walk.onnx",
+    "seconds": 10.0,
+    "trunk_z_mean_m": -0.0589,
+    "tilt_max_deg": 173.26,
+    "xy_travel_m": 0.176,
+    "survived": false,
+    "note": "sim-only; a 'survived' here is NOT a deployment acceptance result"
+  }
+]

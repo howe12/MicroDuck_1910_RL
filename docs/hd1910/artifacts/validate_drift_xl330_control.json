@@ -1,0 +1,14 @@
+[
+  {
+    "stage": "drift",
+    "seconds": 10.0,
+    "trunk_z_start_m": 0.1179,
+    "trunk_z_end_m": -0.1051,
+    "trunk_z_delta_mm": -223.0,
+    "tilt_max_deg": 179.72,
+    "max_joint_creep_mrad": 77.91,
+    "mean_joint_creep_mrad": 32.15,
+    "fell_at_s": 2.54,
+    "verdict": "FELL at 2.5s"
+  }
+]

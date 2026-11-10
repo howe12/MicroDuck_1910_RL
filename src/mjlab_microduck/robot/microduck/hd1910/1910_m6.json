@@ -1,0 +1,11 @@
+{
+  "kt": 0.623761,
+  "R": 4.910192,
+  "armature": 0.0017819,
+  "friction_base": 0.015803,
+  "friction_stribeck": 0.009590,
+  "command_delay": 0.006005,
+  "max_velocity": 100,
+  "actuator": "sts3215",
+  "model": "m6"
+}
