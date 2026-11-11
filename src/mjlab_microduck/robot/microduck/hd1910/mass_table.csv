@@ -1,5 +1,5 @@
 body,part_label,mass_g,com_mm,inertia_mode,inertia_kgm2,status,source,notes
-trunk_base,躯干壳体 + 电池 + 主控/扩展 PCB + 线束（推定）,,,scale,,baseline,unchanged: no servo on this body,含 NP-F550 电池 104 g 与否待称重确认（见 docs/hd1910/BOM.md）；壳体+板卡+线束约 95 g + 电池 104 g
+trunk_base,躯干壳体 + 电池 + 主控/扩展 PCB + 线束（推定）,,,scale,,baseline,unchanged: no servo on this body,口径A（2026-11-11 确认）：含 NP-F550 104 g；壳体+板卡+线束约 95 g
 yaw2roll,左髋 yaw→roll 支架 + 舵机（推定）,26.04,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
 hip_l,左髋 roll 支架 + 轴承（推定）,9.19,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
 upper_leg_left,左大腿 + 舵机 + 舵盘（推定）,51.21,,scale,,estimated,datasheet HD-1910-C001 A/0: 21g vs XL330 18g (+3g/servo),规格书推算 +3g；未实称
