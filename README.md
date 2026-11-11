@@ -20,6 +20,14 @@ MicroDuck 双足机器人在**仿真中**的强化学习训练工程，执行器
 export UV_HTTP_TIMEOUT=600
 uv sync
 
+# 若 uv sync 卡在 better-actuator-models（GitHub git 依赖）上：
+#   1) 先设置 git 缓冲再重试
+git config --global http.postBuffer 524288000
+uv sync
+#   2) 仍失败则本地 vendor（改 pyproject.toml 的 [tool.uv.sources]）：
+#   git clone https://github.com/Rhoban/bam.git third_party/bam
+#   better-actuator-models = { path = "third_party/bam", editable = true }
+
 # 1) 6 秒验证工程是活的（64 环境 × 5 轮冒烟）
 uv run train Mjlab-Velocity-Flat-MicroDuck-HD1910 \
     --env.scene.num-envs 64 --agent.max_iterations 5 \
