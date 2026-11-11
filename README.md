@@ -11,6 +11,9 @@ MicroDuck 双足机器人在**仿真中**的强化学习训练工程，执行器
 
 > 本仓库只覆盖「仿真 + 训练 + 导出」。真机运行时、舵机零位标定、实机验收不在范围内。
 
+**许可**：代码 Apache-2.0；`assets/*.stl` 等 3D 模型为 **CC BY-SA-NC（不可商用）**。
+详见 [`NOTICE.md`](NOTICE.md) 与文末「许可」一节。
+
 ## 快速开始
 
 需要 CUDA GPU 与 [uv](https://docs.astral.sh/uv/)。
