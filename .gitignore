@@ -41,3 +41,6 @@ logdir/.claude/worktrees/
 
 # HD1910 evidence (validation JSON / logs) is intentionally tracked
 !docs/hd1910/artifacts/
+
+# pytest
+.pytest_cache/
