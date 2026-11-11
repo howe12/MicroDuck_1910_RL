@@ -77,7 +77,7 @@ src/mjlab_microduck/
 
 tests/         195 个 CPU 测试（11 秒跑完）
 scripts/       export / play_latest / hd1910_validate / infer_policy …
-docs/hd1910/   质量表说明、参数溯源、验证记录、artifacts
+docs/hd1910/   质量表说明、参数溯源、BOM 与电池口径、验证记录、artifacts
 ```
 
 ## 当前状态（重要）
@@ -89,6 +89,7 @@ docs/hd1910/   质量表说明、参数溯源、验证记录、artifacts
 | 执行器 | 规格书推导：kt=0.7355 N·m/A、R=3.7 Ω → 堵转 **1.471 N·m** @7.4 V，刚度 1.21 N·m/rad |
 | 测试 | 195 passed, 1 skipped |
 | 训练 | 冒烟通过；**正式 5000 轮尚未跑** |
+| 电池 | NP-F550 2200 mAh，**104 g**（实测）；是否已含在 `trunk_base` 里待一次称重确认，见 [`docs/hd1910/BOM.md`](docs/hd1910/BOM.md) |
 
 质量表里 `status=estimated` 的行是规格书推算，`baseline` 是无舵机保持原值。
 **实称后**改 `mass_table.csv` 再跑一次生成器即可，代码不用动：
