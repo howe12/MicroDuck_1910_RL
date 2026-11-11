@@ -1,0 +1,121 @@
+[
+  {
+    "bucket": "stand",
+    "cmd": {
+      "vx": 0.0,
+      "vy": 0.0,
+      "wz": 0.0
+    },
+    "achieved_vx": -0.0,
+    "achieved_vy": -0.0,
+    "achieved_wz": 0.001,
+    "err_vx": 0.001,
+    "err_vy": 0.0,
+    "err_wz": 0.006,
+    "trunk_z_m": 0.116,
+    "tilt_deg": 0.8,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "fwd_slow",
+    "cmd": {
+      "vx": 0.15,
+      "vy": 0.0,
+      "wz": 0.0
+    },
+    "achieved_vx": 0.118,
+    "achieved_vy": 0.006,
+    "achieved_wz": 0.048,
+    "err_vx": 0.032,
+    "err_vy": 0.028,
+    "err_wz": 0.108,
+    "trunk_z_m": 0.116,
+    "tilt_deg": 2.2,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "fwd_fast",
+    "cmd": {
+      "vx": 0.4,
+      "vy": 0.0,
+      "wz": 0.0
+    },
+    "achieved_vx": 0.342,
+    "achieved_vy": -0.005,
+    "achieved_wz": 0.004,
+    "err_vx": 0.058,
+    "err_vy": 0.044,
+    "err_wz": 0.133,
+    "trunk_z_m": 0.117,
+    "tilt_deg": 3.2,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "back",
+    "cmd": {
+      "vx": -0.2,
+      "vy": 0.0,
+      "wz": 0.0
+    },
+    "achieved_vx": -0.192,
+    "achieved_vy": 0.008,
+    "achieved_wz": -0.096,
+    "err_vx": 0.012,
+    "err_vy": 0.028,
+    "err_wz": 0.141,
+    "trunk_z_m": 0.117,
+    "tilt_deg": 2.3,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "lat",
+    "cmd": {
+      "vx": 0.0,
+      "vy": 0.2,
+      "wz": 0.0
+    },
+    "achieved_vx": 0.009,
+    "achieved_vy": 0.173,
+    "achieved_wz": -0.01,
+    "err_vx": 0.009,
+    "err_vy": 0.054,
+    "err_wz": 0.213,
+    "trunk_z_m": 0.118,
+    "tilt_deg": 2.6,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "wz",
+    "cmd": {
+      "vx": 0.0,
+      "vy": 0.0,
+      "wz": 0.8
+    },
+    "achieved_vx": -0.0,
+    "achieved_vy": 0.001,
+    "achieved_wz": 0.117,
+    "err_vx": 0.002,
+    "err_vy": 0.007,
+    "err_wz": 0.683,
+    "trunk_z_m": 0.117,
+    "tilt_deg": 1.1,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "mix",
+    "cmd": {
+      "vx": 0.25,
+      "vy": 0.1,
+      "wz": 0.4
+    },
+    "achieved_vx": 0.229,
+    "achieved_vy": 0.081,
+    "achieved_wz": 0.355,
+    "err_vx": 0.021,
+    "err_vy": 0.059,
+    "err_wz": 0.156,
+    "trunk_z_m": 0.117,
+    "tilt_deg": 2.9,
+    "fall_ratio": 0.0
+  }
+]
