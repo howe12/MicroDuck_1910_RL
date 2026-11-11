@@ -33,6 +33,8 @@ from mjlab_microduck.robot.microduck_constants import (
     HD1910_MASS_TABLE,
     MICRODUCK_WALK_HD1910_ROBOT_CFG,
 )
+from mjlab.managers import CurriculumTermCfg, RewardTermCfg
+from mjlab_microduck.tasks import mdp as microduck_mdp
 from mjlab_microduck.tasks.microduck_velocity_env_cfg import (
     MicroduckRlCfg,
     make_microduck_velocity_env_cfg,
@@ -103,6 +105,26 @@ def make_microduck_velocity_hd1910_env_cfg(
     # sensors, commands, DR, noise, delays, curricula, 61-D obs — is inherited
     # by construction so the two policies stay A/B comparable.
     cfg.scene.entities = {"robot": MICRODUCK_WALK_HD1910_ROBOT_CFG}
+
+    # ── run-2 reward rebalance (2026-11-11) ────────────────────────────────
+    # Run 1 converged to "stand still and march in place" (velocity error
+    # 0.40 m/s after 4000 iterations). The XL330-tuned weights hand a standing
+    # robot ~5.1 of the ~6.5 available reward; walking adds ~0.6 but risks it
+    # all. These four changes flip the economics — see the block at the bottom
+    # of tasks/mdp.py for the measurements behind them.
+    cfg.rewards["track_linear_velocity"].weight = 4.0      # was 2.0
+    cfg.rewards["head_pose_tracking"].weight = 1.0         # was 2.0 (largest term)
+    cfg.rewards["air_time"].func = microduck_mdp.feet_air_time_with_progress
+    cfg.rewards["no_progress"] = RewardTermCfg(
+        func=microduck_mdp.no_progress_penalty,
+        weight=0.5,          # positive: the function self-negates (AGENTS.md)
+        params={"command_name": "twist", "min_speed": 0.02},
+    )
+    # Live retuning: write {"track_linear_velocity": 4.5} to weights_override.json
+    cfg.curriculum["weight_override"] = CurriculumTermCfg(
+        func=microduck_mdp.weight_override_curriculum,
+        params={"path": "weights_override.json"},
+    )
 
     # Defensive assertions: a silent obs/action drift here would produce an
     # ONNX the runtime refuses to load, hours into a run.

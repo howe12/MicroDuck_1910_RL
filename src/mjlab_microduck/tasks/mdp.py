@@ -7186,3 +7186,122 @@ def roulade_lateral_velocity_penalty(
     """Body-frame lateral (y) linear velocity² — keeps the roll straight."""
     asset: Entity = env.scene[asset_cfg.name]
     return torch.nan_to_num(asset.data.root_link_lin_vel_b[:, 1].pow(2), nan=0.0)
+
+
+# ==============================================================================
+# HD-1910 run-2 fixes (2026-11-11)
+# ==============================================================================
+# Run 1 (5000 iterations, HD-1910 actuator) converged to "stand still and march
+# in place": episode length 990/1000, velocity error xy stuck at 0.40 m/s while
+# commands go to ±0.4. Reward breakdown at iter 4072 showed why — the terms a
+# standing robot can collect (upright 1.77 + head_pose 1.71 + air_time 1.02 +
+# pose 0.61 = 5.1) dwarf what walking adds (track_linear 1.35 of 2.0 max).
+#
+# The three functions below change that economics:
+#   * air_time only pays when the robot is actually displacing along the command
+#     (marching in place no longer collects it),
+#   * no_progress_penalty charges for standing still under a non-zero command,
+#   * weight_override_curriculum lets weights be retuned mid-run from a JSON
+#     file, so the next experiment does not need a restart.
+
+
+def feet_air_time_with_progress(
+    env: ManagerBasedRlEnv,
+    sensor_name: str,
+    threshold_min: float = 0.125,
+    threshold_max: float = 0.3,
+    command_name: str = "twist",
+    command_threshold: float = 0.01,
+    min_progress: float = 0.02,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+) -> torch.Tensor:
+    """`feet_air_time`, gated on displacing ALONG the commanded direction.
+
+    Run 1 farmed the ungated version by lifting its feet while standing: air
+    time only checks that the command is non-zero, not that the robot moves.
+    Here a step only pays if the base velocity projected on the command is
+    above `min_progress` [m/s]. Zero/near-zero commands keep the full reward
+    (there is nothing to track, and standing still must stay worthwhile).
+    """
+    from mjlab.tasks.velocity.mdp import rewards as _velocity_rewards
+
+    reward = _velocity_rewards.feet_air_time(
+        env,
+        sensor_name=sensor_name,
+        threshold_min=threshold_min,
+        threshold_max=threshold_max,
+        command_name=command_name,
+        command_threshold=command_threshold,
+    )
+    command = env.command_manager.get_command(command_name)
+    asset: Entity = env.scene[asset_cfg.name]
+    vel = asset.data.root_link_lin_vel_b[:, :2]
+    cmd_xy = command[:, :2]
+    cmd_norm = torch.norm(cmd_xy, dim=1)
+    along = (vel * cmd_xy).sum(dim=1) / torch.clamp(cmd_norm, min=1e-6)
+    needs_motion = cmd_norm > 0.05
+    gate = torch.where(needs_motion, (along > min_progress).to(vel.dtype),
+                       torch.ones_like(along))
+    return reward * gate
+
+
+def no_progress_penalty(
+    env: ManagerBasedRlEnv,
+    command_name: str = "twist",
+    min_speed: float = 0.02,
+    command_deadzone: float = 0.05,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+) -> torch.Tensor:
+    """-1 for every env that has a walking command but is not moving with it.
+
+    Self-negating (returns <= 0) → register with a POSITIVE weight, per the
+    sign convention in AGENTS.md. Zero-command envs (the deployment idle state)
+    are never charged.
+    """
+    command = env.command_manager.get_command(command_name)
+    asset: Entity = env.scene[asset_cfg.name]
+    cmd_xy = command[:, :2]
+    cmd_norm = torch.norm(cmd_xy, dim=1)
+    vel = asset.data.root_link_lin_vel_b[:, :2]
+    along = (vel * cmd_xy).sum(dim=1) / torch.clamp(cmd_norm, min=1e-6)
+    stalled = (cmd_norm > command_deadzone) & (along < min_speed)
+    return -stalled.to(vel.dtype)
+
+
+def weight_override_curriculum(
+    env: ManagerBasedRlEnv,
+    env_ids: torch.Tensor,
+    path: str = "weights_override.json",
+) -> torch.Tensor:
+    """Live reward-weight retuning from a JSON file, applied every iteration.
+
+    Write ``{"track_linear_velocity": 4.0, "air_time": 1.0}`` to the file and
+    the next control step uses it — no restart, no checkpoint juggling. Delete
+    the file (or empty it) to freeze the current values.
+
+    Caveat recorded in AGENTS.md: a large single jump mis-calibrates the value
+    function (advantage blow-up → the NaN patches in this module exist for
+    exactly that). Keep each change under ~30% and let the value catch up for
+    20–30 iterations before the next one.
+    """
+    import json
+    import os
+    from pathlib import Path
+
+    del env_ids
+    path = os.environ.get("MICRODUCK_WEIGHTS_OVERRIDE", path)
+    p = Path(path)
+    if not p.exists():
+        return torch.tensor([0.0], device=env.device)
+    try:
+        overrides = json.loads(p.read_text())
+    except Exception:
+        return torch.tensor([-1.0], device=env.device)
+    applied = 0
+    for name, weight in overrides.items():
+        try:
+            env.reward_manager.get_term_cfg(name).weight = float(weight)
+            applied += 1
+        except Exception:
+            pass
+    return torch.tensor([float(applied)], device=env.device)
