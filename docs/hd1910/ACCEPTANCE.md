@@ -91,10 +91,34 @@ uv run --no-sync scripts/probe_policy_state.py \
 
 ## 4. Roulade（前滚翻）
 
-待训练。注意：**这项对惯量最敏感**，而当前 21 个连杆的惯量仍是按质量比缩放的
-（`ESTIMATED`），翻滚是绕俯仰轴的整体转动，误差会被放大。建议实称/ CAD 重算后再练。
+待训练。配方要点（供复现）：
 
-验收判据：完成 ≥340° 的躯干俯仰变化并回到站立，落地阶段无头壳触地终止。
+| 机制 | 取值 / 做法 |
+|---|---|
+| 相位门控 | `MIDROLL_PITCH_MIN 50°`、`MAX 340°`，落地门 260–330° |
+| 中滚重生（反向课程） | 直接 spawn 到 50°–340° 的滚动中途，`ω ∈ (0, 3) rad/s` |
+| TUCK 锚点 | 收腿 + **收下巴**（`neck_pitch −1.0`），让头顶平面贴地形成 latch |
+| 助跑钩子 | `ROULADE_FORWARD_VEL_RANGE (0,0)`，改 `(0, 0.3)` 可练“走着翻” |
+| 对称性增强 | 唯一开 `ENABLE_SYMMETRY=True` 的任务 |
+| 回合长度 | 5 s |
+
+验收命令（本轮新建）：
+
+```bash
+uv run --no-sync scripts/accept_roulade.py --onnx policies/roulade.onnx \
+  --out docs/hd1910/artifacts/roulade_accept.json
+```
+
+判据：`pitch_span ≥ 340°`（真的翻过去）、`inverted_time_ratio > 0`、终态站立。
+
+### 在 HD-1910 上必须先想的四条风险
+
+| # | 风险 | 依据 | 对策 |
+|---|---|---|---|
+| 1 | **惯量仍是 ESTIMATED** | 21 个连杆的惯量按质量比从 XL330 缩放；翻滚是绕俯仰轴的整体转动，对惯量最敏感 | 先实测/ CAD 重算，或把 `MASS_INERTIA_RANDOMIZATION_RANGE` 从 ±5% 放宽到 ±20% |
+| 2 | **头部质量变了，latch 压力变了** | 收下巴靠头顶贴地产生支撑；HD1910 舵机 21 g vs XL330 18 g，头部总重变化 | 训练前先在 `home` 姿态量一次头顶接触力 |
+| 3 | **落地冲击更大** | `k_eff` 1.21 vs XL330 0.56（刚 2.2 倍），整机 782 g vs 737 g | 关注 `gentle_landing` 项与 `dof_pos_limits` 是否频繁触发 |
+| 4 | **助跑钩子默认关闭** | `ROULADE_FORWARD_VEL_RANGE=(0,0)`，只从静止起翻 | 先按静止练；能翻之后再用 `(0, 0.3)` 接走路策略 |
 
 ---
 
