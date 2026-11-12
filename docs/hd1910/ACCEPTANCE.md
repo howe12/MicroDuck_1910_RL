@@ -172,6 +172,52 @@ uv run --no-sync scripts/accept_roulade.py --onnx policies/roulade.onnx \
 
 ---
 
+## 5. 地形：不平路面与斜坡
+
+两个任务，同一个 61→14 的观测/动作契约，都带 run-3 的奖励重配平：
+
+| 任务 | 地形 | 状态 |
+|---|---|---|
+| `Mjlab-Velocity-Rough-MicroDuck-HD1910` | 随机箱体、粗糙块、1.7–5.7° 金字塔缓坡 | 任务已注册（上游配方 + HD1910 机器人） |
+| `Mjlab-Velocity-Slope-MicroDuck-HD1910` | **2–20° 斜坡**（10 级难度课程），平路起跑 → 上坡 → 下坡 | 本轮新建 |
+
+### 斜坡地形怎么做的
+
+`FlatRampTerrainCfg`（原本只给轮滑任务用）生成「平路 + 斜坡 + 出口」的地形砖：
+
+```python
+TerrainGeneratorCfg(size=8.0, curriculum=True, num_rows=10,
+    sub_terrains={"ramp": FlatRampTerrainCfg(
+        flat_length=2.0, ramp_length_range=(4.0, 8.0), runout_length=3.0,
+        spawn_on_ramp=0.0, deg_min=2.0, deg_max=20.0)})
+```
+
+- **10 行 = 10 级难度**，`terrain_levels` 课程按行走距离升降级；
+- `spawn_on_ramp=0` 让机器人从平路起跑、再走上斜坡（而不是直接生在坡上）；
+- 指令会随机重采样，所以它会**上坡、下坡、横穿**三种情况都遇到。
+
+### 显存限制（实测）
+
+| 环境数 | 结果 |
+|---|---|
+| 512 / 1024 | ✅ 可训练 |
+| 2048+ | ❌ OOM（8 GB 卡） |
+
+所以地形任务必须用 `--env.scene.num-envs 1024`，迭代速度比平地 4096 慢约 2.4 倍。
+
+### 验收方式
+
+直接复用走路验收脚本，但换成地形任务——`fall_ratio` 就变成了"在坡上摔不摔"：
+
+```bash
+uv run --no-sync scripts/accept_velocity.py \
+  --task Mjlab-Velocity-Slope-MicroDuck-HD1910 \
+  --onnx policies/hd1910_slope.onnx --num-envs 8 --seconds 10 \
+  --out docs/hd1910/artifacts/accept_slope.json
+```
+
+判据：与平地相比，`fwd_fast` 达成速度下降不超过 30%，且 `fall_ratio ≤ 0.10`。
+
 ## 附：数据与视频索引
 
 | 文件 | 内容 |

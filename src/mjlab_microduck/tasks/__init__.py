@@ -31,6 +31,10 @@ from .microduck_velocity_hd1910_env_cfg import (
     make_microduck_velocity_hd1910_env_cfg,
     MicroduckHd1910RlCfg,
 )
+from .microduck_terrain_hd1910_env_cfg import (
+    make_microduck_velocity_slope_hd1910_env_cfg,
+    MicroduckHd1910SlopeRlCfg,
+)
 from .microduck_tricks_hd1910_env_cfg import (
     make_microduck_roulade_hd1910_env_cfg,
     make_microduck_standup_hd1910_env_cfg,
@@ -114,6 +118,14 @@ register_mjlab_task(
     env_cfg=make_microduck_velocity_hd1910_env_cfg(rough=True),
     play_env_cfg=make_microduck_velocity_hd1910_env_cfg(play=True, rough=True),
     rl_cfg=MicroduckHd1910RlCfg,
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+register_mjlab_task(
+    task_id="Mjlab-Velocity-Slope-MicroDuck-HD1910",
+    env_cfg=make_microduck_velocity_slope_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_velocity_slope_hd1910_env_cfg(play=True),
+    rl_cfg=MicroduckHd1910SlopeRlCfg,
     runner_cls=MicroduckOnPolicyRunner,
 )
 
