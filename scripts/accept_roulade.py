@@ -77,6 +77,14 @@ def main(argv=None) -> int:
     # measurement is pitch-based, so the task's termination logic is not needed.
     cfg.terminations = {}
     cfg.episode_length_s = args.seconds + 5.0
+    # The task spawns half its envs MID-ROLL (the reverse curriculum). A mid-roll
+    # spawn that just tips over the top counts as a "completed roll" without the
+    # robot ever having to initiate one, which inflates the ratio. Acceptance has
+    # to start from standing.
+    ev = cfg.events.get("set_roulade_state")
+    if ev is not None:
+        ev.params.update(standing_prob=1.0, midroll_prob=0.0)
+        cfg.curriculum.pop("roulade_spawn_mix", None)
     if args.video:
         cfg.viewer = _closeup_viewer()
 

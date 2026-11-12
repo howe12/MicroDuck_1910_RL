@@ -1,10 +1,10 @@
 {
   "onnx": "policies/hd1910_roulade.onnx",
   "seconds": 6.0,
-  "pitch_span_median_deg": 294.7,
-  "pitch_span_p90_deg": 369.6,
-  "completed_roll_ratio": 0.422,
-  "inverted_time_ratio": 0.044,
+  "pitch_span_median_deg": 368.4,
+  "pitch_span_p90_deg": 374.0,
+  "completed_roll_ratio": 0.922,
+  "inverted_time_ratio": 0.05,
   "standing_at_end_ratio": 1.0,
-  "z_end_mean": 0.1143
+  "z_end_mean": 0.1144
 }
