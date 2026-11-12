@@ -129,13 +129,38 @@ uv run --no-sync scripts/probe_policy_state.py \
 
 ## 3. VelStand（走路 + 摔倒恢复一体）
 
-待训练。已确认其 walk 层继承 run 2 的重配平（`hd1910_tuning.apply_velocity_rebalance`），
-且保留自带的 `feet_air_time_upright` 门控。
+### 最终结果（4000 轮，`model_3999`）
 
-验收判据：
-- 从趴/仰/坐三种姿态起身（同 StandUp 的表格）
-- 起身后能按指令走（fwd_fast ≥ 0.3 m/s）
-- 行走中被推倒 → 自主爬起 → 继续走（`push_robot` 打开，看 30 秒内的恢复次数）
+验收方式：按 0.25 m/s 走 3 秒 → **把每个环境强制打翻**（40% 趴 / 30% 仰 / 30% 坐）
+→ 自由运行 8 秒，测爬起来的时间与恢复后的速度。
+
+| 指标 | 实测 | 判据 | 判定 |
+|---|---:|---|---|
+| 行走速度 | **0.271 m/s** | ≥0.20 | ✅ |
+| 打翻率 | 1.00 | — | 对照组正常 |
+| **恢复率** | **1.00** | ≥0.80 | ✅ |
+| 恢复时间（中位） | **0.32–0.49 s** | ≤3 s | ✅ |
+| 恢复时间（p90） | 0.73 s | ≤5 s | ✅ |
+| 终态站立率 | **1.00** | ≥0.95 | ✅ |
+| **恢复后速度** | **0.266 m/s** | ≥0.20 | ✅ |
+
+![打翻后恢复](/tmp/frames/velstand.png)
+
+**一个策略同时会走、会被打翻、会自己爬起来继续走**，且恢复后速度几乎无损（0.271 → 0.266）。
+
+### 一个反直觉的观察
+
+训练日志里 `Episode_Reward/recovery_success` 全程只有 **0.002–0.005**，看起来像"完全没学会"。
+但实测恢复率是 **100%**。原因是该奖励只在特定状态转移上记账，且被 20 秒回合、
+大量成功样本稀释——**奖励曲线在这里完全误导**。这也再次说明为什么每个阶段都必须实测。
+
+验收命令：
+
+```bash
+uv run --no-sync scripts/accept_velstand.py \
+  --onnx policies/hd1910_velstand.onnx --num-envs 16 \
+  --out docs/hd1910/artifacts/velstand_accept.json
+```
 
 ---
 
@@ -231,5 +256,7 @@ uv run --no-sync scripts/accept_velocity.py \
 | `policies/hd1910_v3_walk.onnx` | **run 3 策略：线性四轴达标 + 原地转向 0.99 rad/s** |
 | `policies/hd1910_standup.onnx` | **起身策略：趴/坐/仰三姿态 100% 恢复** |
 | `docs/hd1910/videos/standup_from_supine_OK.mp4` | 仰面起身成功（对比 `_FAIL` 那段） |
+| `policies/hd1910_velstand.onnx` | **走+摔倒恢复一体：恢复率 100%** |
+| `docs/hd1910/videos/velstand_knockdown.mp4` | 走→被打翻→爬起来继续走 |
 | `docs/hd1910/videos/accept_wz.mp4` | 原地转向特写 |
 | `docs/hd1910/videos/accept_fwd_fast.mp4` | 0.4 m/s 行走特写 |
