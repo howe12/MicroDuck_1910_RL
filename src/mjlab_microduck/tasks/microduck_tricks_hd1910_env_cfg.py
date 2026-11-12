@@ -35,6 +35,7 @@ from mjlab.rl import RslRlOnPolicyRunnerCfg
 from mjlab_microduck.robot.microduck_constants import (
     MICRODUCK_ALLCOLLISIONS_HD1910_ROBOT_CFG,
 )
+from mjlab_microduck.tasks import hd1910_tuning
 from mjlab_microduck.tasks.microduck_roulade_env_cfg import (
     MicroduckRouladeRlCfg,
     make_microduck_roulade_env_cfg,
@@ -85,7 +86,14 @@ def make_microduck_standup_hd1910_env_cfg(
 def make_microduck_velstand_hd1910_env_cfg(
     play: bool = False, rough: bool = False
 ) -> ManagerBasedRlEnvCfg:
-    return _swap_robot(make_microduck_velstand_env_cfg(play=play, rough=rough))
+    cfg = _swap_robot(make_microduck_velstand_env_cfg(play=play, rough=rough))
+    # VelStand builds its walk layer from the *unmodified* upstream velocity
+    # recipe, so without this it would inherit exactly the economics that made
+    # run 1 stand still on the HD-1910. Apply the run-2 rebalance, but keep
+    # VelStand's own air_time (it gates on upright so a fallen robot cannot farm
+    # it by shaking a leg).
+    hd1910_tuning.apply_velocity_rebalance(cfg, air_time_progress=False)
+    return cfg
 
 
 def make_microduck_roulade_hd1910_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:

@@ -34,6 +34,7 @@ from mjlab_microduck.robot.microduck_constants import (
     MICRODUCK_WALK_HD1910_ROBOT_CFG,
 )
 from mjlab.managers import CurriculumTermCfg, RewardTermCfg
+from mjlab_microduck.tasks import hd1910_tuning
 from mjlab_microduck.tasks import mdp as microduck_mdp
 from mjlab_microduck.tasks.microduck_velocity_env_cfg import (
     MicroduckRlCfg,
@@ -112,14 +113,7 @@ def make_microduck_velocity_hd1910_env_cfg(
     # robot ~5.1 of the ~6.5 available reward; walking adds ~0.6 but risks it
     # all. These four changes flip the economics — see the block at the bottom
     # of tasks/mdp.py for the measurements behind them.
-    cfg.rewards["track_linear_velocity"].weight = 4.0      # was 2.0
-    cfg.rewards["head_pose_tracking"].weight = 1.0         # was 2.0 (largest term)
-    cfg.rewards["air_time"].func = microduck_mdp.feet_air_time_with_progress
-    cfg.rewards["no_progress"] = RewardTermCfg(
-        func=microduck_mdp.no_progress_penalty,
-        weight=0.5,          # positive: the function self-negates (AGENTS.md)
-        params={"command_name": "twist", "min_speed": 0.02},
-    )
+    hd1910_tuning.apply_velocity_rebalance(cfg)
     # ── run-3: 补原地转向 (2026-11-12) ─────────────────────────────────────
     # 分轴评估显示 run 2 的线性轴很好（前向 0.33/0.40、后向 0.19/0.20、横移
     # 0.17/0.20），但原地转向完全不会：指令 0.3 和 0.8 rad/s 都只到 0.01~0.12，
