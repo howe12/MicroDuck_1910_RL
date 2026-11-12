@@ -44,7 +44,7 @@ from mjlab_microduck.robot.microduck_constants import (
     MICRODUCK_WALK_HD1910_ROBOT_CFG,
 )
 
-TILE_SIZE = 8.0
+TILE_SIZE = (14.0, 6.0)  # (width, height); width must fit flat+ramp_max+runout = 13 m
 
 # Ramps are walked BOTH ways: the robot spawns on the flat run-up, the command
 # resamples as it goes, so it climbs, descends and traverses at random. 2 deg at
