@@ -1,0 +1,17 @@
+{
+  "task": "Mjlab-StandUp-Flat-MicroDuck-HD1910",
+  "onnx": "/tmp/standup_probe.onnx",
+  "seconds": 6.0,
+  "num_envs": 32,
+  "z_end_mean": 0.1136,
+  "z_end_p10": 0.1148,
+  "z_end_p90": 0.1158,
+  "tilt_end_mean_deg": 4.0,
+  "z_max_reached_mean": 0.1214,
+  "z_start_mean": 0.088,
+  "started_down_ratio": 0.562,
+  "recovered_ratio": 0.944,
+  "standing_ratio": 0.969,
+  "crouched_ratio": 0.0,
+  "down_ratio": 0.031
+}
