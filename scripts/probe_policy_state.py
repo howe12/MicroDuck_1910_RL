@@ -56,8 +56,10 @@ def main(argv=None) -> int:
     ap.add_argument("--seconds", type=float, default=6.0)
     ap.add_argument("--control-hz", type=float, default=50.0)
     ap.add_argument("--video", default=None, help="write an mp4 of the first 6 s")
+    ap.add_argument("--force-state", choices=["down", "up", "sitting", "standing"],
+                    default=None, help="force every env to start in this ground state")
     ap.add_argument("--force-down", action="store_true",
-                    help="make every env start face-down (worst case, for video)")
+                    help="alias for --force-state down")
     ap.add_argument("--out", default=None)
     args = ap.parse_args(argv)
 
@@ -72,11 +74,16 @@ def main(argv=None) -> int:
     cfg = load_env_cfg(args.task)
     cfg.scene.num_envs = args.num_envs
     cfg.auto_reset = False  # measure the fate of the first attempt, not a reset loop
-    if args.force_down:
+    forced = args.force_state or ("down" if args.force_down else None)
+    if forced:
         ev = cfg.events.get("set_ground_state")
         if ev is not None:
-            ev.params.update(face_down_prob=1.0, face_up_prob=0.0,
-                             sitting_prob=0.0, standing_prob=0.0)
+            ev.params.update(
+                face_down_prob=1.0 if forced == "down" else 0.0,
+                face_up_prob=1.0 if forced == "up" else 0.0,
+                sitting_prob=1.0 if forced == "sitting" else 0.0,
+                standing_prob=1.0 if forced == "standing" else 0.0,
+            )
             # The ground_state_mix curriculum rewrites those probabilities on
             # every step — drop it or the override survives exactly one reset.
             cfg.curriculum.pop("ground_state_mix", None)

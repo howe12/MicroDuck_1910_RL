@@ -120,6 +120,13 @@ def make_microduck_velocity_hd1910_env_cfg(
         weight=0.5,          # positive: the function self-negates (AGENTS.md)
         params={"command_name": "twist", "min_speed": 0.02},
     )
+    # ── run-3: 补原地转向 (2026-11-12) ─────────────────────────────────────
+    # 分轴评估显示 run 2 的线性轴很好（前向 0.33/0.40、后向 0.19/0.20、横移
+    # 0.17/0.20），但原地转向完全不会：指令 0.3 和 0.8 rad/s 都只到 0.01~0.12，
+    # 而"边走边转"能达到指令的 88%。所以只加压转向，不动已经work的线性项。
+    cfg.rewards["track_angular_velocity"].weight = 3.0        # was 2.0（线性权重 4.0 压制了转向）
+    cfg.commands["twist"].rel_turn_in_place_envs = 0.35       # was 0.15（转向样本密度翻倍）
+
     # Live retuning: write {"track_linear_velocity": 4.5} to weights_override.json
     cfg.curriculum["weight_override"] = CurriculumTermCfg(
         func=microduck_mdp.weight_override_curriculum,
