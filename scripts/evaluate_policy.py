@@ -83,6 +83,7 @@ def run_bucket(env, sess, name, vec, seconds, control_hz=50.0, record=False):
     cmd = np.array(vec, dtype=np.float64)
     steps = int(seconds * control_hz)
     vx, vy, wz, zs, tilts = [], [], [], [], []
+    air, foot_z = [], []
     frames = []
     falls = 0
 
@@ -115,6 +116,23 @@ def run_bucket(env, sess, name, vec, seconds, control_hz=50.0, record=False):
             except Exception:
                 frames = None
         zs.append(robot.data.root_link_pos_w[:, 2].detach().cpu().numpy().mean())
+        # Gait shape: how long the feet actually stay off the ground, and how high
+        # they get. A "shuffle" shows up here long before it shows up in the
+        # velocity error.
+        try:
+            sensor = env.scene["feet_ground_contact"]
+            at = sensor.data.current_air_time
+            if at is not None:
+                air.append(at.detach().cpu().numpy().mean())
+        except Exception:
+            pass
+        for site in ("left_foot", "right_foot"):
+            try:
+                pos = env.scene["robot"].data.site_pos_w
+                ids, _ = env.scene["robot"].find_sites(site)
+                foot_z.append(pos[:, ids[0], 2].detach().cpu().numpy().mean())
+            except Exception:
+                pass
 
     def err(actual, target):
         return float(np.mean(np.abs(np.array(actual) - target)))
@@ -129,6 +147,9 @@ def run_bucket(env, sess, name, vec, seconds, control_hz=50.0, record=False):
         "err_vy": round(err(vy, cmd[1]), 3),
         "err_wz": round(err(wz, cmd[2]), 3),
         "trunk_z_m": round(float(np.mean(zs)), 3),
+        "air_time_mean_s": round(float(np.mean(air)), 4) if air else None,
+        "air_time_max_s": round(float(np.max(air)), 4) if air else None,
+        "foot_height_min_m": round(float(np.min(foot_z)), 4) if foot_z else None,
         "tilt_deg": round(float(np.mean(tilts)), 1),
         "fall_ratio": round(falls / (steps * env.num_envs), 3),
         "_frames": frames,
