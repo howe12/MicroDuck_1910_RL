@@ -3,14 +3,20 @@
 
 The trick tasks log rewards, not state: a stand-up policy that never rises can
 still collect ``pose_stand_*`` and finish its episode without terminating. This
-runs the exported policy from the task's own reset distribution and reports
-where the robot physically ends up.
+runs the exported policy from a *forced* reset pose and reports where the robot
+physically ends up.
 
+    # one pose
     uv run --no-sync scripts/probe_policy_state.py \
-        --task Mjlab-StandUp-Flat-MicroDuck-HD1910 --onnx policies/standup.onnx
+        --task Mjlab-StandUp-Flat-MicroDuck-HD1910 --onnx policies/standup.onnx \
+        --force-state up
 
-Stands on ``trunk_base`` height and tilt, which are the two quantities the
-rewards are proxies for:
+    # acceptance: all four poses in one table
+    uv run --no-sync scripts/probe_policy_state.py \
+        --task Mjlab-StandUp-Flat-MicroDuck-HD1910 --onnx policies/standup.onnx \
+        --force-state all --out docs/hd1910/artifacts/standup_accept.json
+
+``trunk_base`` height and tilt are the quantities the rewards are proxies for:
 
     standing  z > 0.10 m and tilt < 20 deg      (HOME is ~0.115 m)
     crouched  0.075 < z <= 0.10
@@ -22,9 +28,12 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 
 import numpy as np
 import torch
+
+STATES = ("down", "up", "sitting", "standing")
 
 
 def _closeup_viewer(width: int = 480):
@@ -47,34 +56,20 @@ def _closeup_viewer(width: int = 480):
         max_extra_envs=0,
     )
 
-def main(argv=None) -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--task", required=True)
-    ap.add_argument("--onnx", required=True)
-    ap.add_argument("--device", default="cuda:0")
-    ap.add_argument("--num-envs", type=int, default=32)
-    ap.add_argument("--seconds", type=float, default=6.0)
-    ap.add_argument("--control-hz", type=float, default=50.0)
-    ap.add_argument("--video", default=None, help="write an mp4 of the first 6 s")
-    ap.add_argument("--force-state", choices=["down", "up", "sitting", "standing"],
-                    default=None, help="force every env to start in this ground state")
-    ap.add_argument("--force-down", action="store_true",
-                    help="alias for --force-state down")
-    ap.add_argument("--out", default=None)
-    args = ap.parse_args(argv)
 
+def probe(task, onnx, device, num_envs, seconds, control_hz, forced, video=None):
     import onnxruntime as ort
     from mjlab.envs import ManagerBasedRlEnv
     from mjlab.tasks.registry import load_env_cfg
 
-    sess = ort.InferenceSession(args.onnx)
+    sess = ort.InferenceSession(onnx)
     inp, out = sess.get_inputs()[0].name, sess.get_outputs()[0].name
     batch = sess.get_inputs()[0].shape[0]
 
-    cfg = load_env_cfg(args.task)
-    cfg.scene.num_envs = args.num_envs
+    cfg = load_env_cfg(task)
+    cfg.scene.num_envs = num_envs
     cfg.auto_reset = False  # measure the fate of the first attempt, not a reset loop
-    forced = args.force_state or ("down" if args.force_down else None)
+
     if forced:
         ev = cfg.events.get("set_ground_state")
         if ev is not None:
@@ -87,19 +82,18 @@ def main(argv=None) -> int:
             # The ground_state_mix curriculum rewrites those probabilities on
             # every step — drop it or the override survives exactly one reset.
             cfg.curriculum.pop("ground_state_mix", None)
-    if args.video:
-        cfg.scene.num_envs = min(args.num_envs, 8)
-    if args.video:
+
+    if video:
         cfg.viewer = _closeup_viewer()
-    env = ManagerBasedRlEnv(cfg=cfg, device=args.device,
-                            render_mode="rgb_array" if args.video else None)
+    env = ManagerBasedRlEnv(cfg=cfg, device=device,
+                            render_mode="rgb_array" if video else None)
     robot = env.scene["robot"]
 
     try:
         env.reset()
         z0 = robot.data.root_link_pos_w[:, 2].detach().cpu().numpy()
         zs, tilts, frames = [], [], []
-        for _ in range(int(args.seconds * args.control_hz)):
+        for _ in range(int(seconds * control_hz)):
             obs = env.obs_buf["actor"].detach().cpu().numpy().astype(np.float32)
             if batch == 1 and obs.shape[0] > 1:
                 actions = np.concatenate(
@@ -113,50 +107,84 @@ def main(argv=None) -> int:
             g = robot.data.projected_gravity_b.detach().cpu().numpy()
             tilt = np.degrees(np.arccos(np.clip(-g[:, 2], -1, 1)))
             zs.append(z)
-            if args.video and len(frames) < 200:
+            tilts.append(tilt)
+            if video and len(frames) < 200:
                 try:
                     img = env.render()
                     if img is not None:
                         frames.append(img)
                 except Exception:
                     pass
-            tilts.append(tilt)
-
-        z_end = zs[-1]
-        tilt_end = tilts[-1]
-        standing = (z_end > 0.10) & (tilt_end < 20)
-        crouched = (z_end > 0.075) & (z_end <= 0.10)
-        result = {
-            "task": args.task,
-            "onnx": args.onnx,
-            "seconds": args.seconds,
-            "num_envs": args.num_envs,
-            "z_end_mean": round(float(z_end.mean()), 4),
-            "z_end_p10": round(float(np.percentile(z_end, 10)), 4),
-            "z_end_p90": round(float(np.percentile(z_end, 90)), 4),
-            "tilt_end_mean_deg": round(float(tilt_end.mean()), 1),
-            "z_max_reached_mean": round(float(np.max(zs, axis=0).mean()), 4),
-            "z_start_mean": round(float(z0.mean()), 4),
-            "started_down_ratio": round(float((z0 < 0.09).mean()), 3),
-            "recovered_ratio": round(
-                float(((z0 < 0.09) & (z_end > 0.10)).sum() / max((z0 < 0.09).sum(), 1)), 3
-            ),
-            "standing_ratio": round(float(standing.mean()), 3),
-            "crouched_ratio": round(float(crouched.mean()), 3),
-            "down_ratio": round(float(1 - standing.mean() - crouched.mean()), 3),
-        }
-        if frames:
-            import imageio.v2 as imageio
-
-            imageio.mimsave(args.video, frames, fps=50)
-            print(f"video: {args.video} ({len(frames)} frames)")
-        print(json.dumps(result, ensure_ascii=False, indent=2))
-        if args.out:
-            from pathlib import Path
-
-            Path(args.out).write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     finally:
         env.close()
+
+    z_end, tilt_end = zs[-1], tilts[-1]
+    standing = (z_end > 0.10) & (tilt_end < 20)
+    crouched = (z_end > 0.075) & (z_end <= 0.10)
+    started_down = z0 < 0.09
+    result = {
+        "forced_state": forced or "task default",
+        "z_start_mean": round(float(z0.mean()), 4),
+        "started_down_ratio": round(float(started_down.mean()), 3),
+        "z_end_mean": round(float(z_end.mean()), 4),
+        "z_max_reached_mean": round(float(np.max(zs, axis=0).mean()), 4),
+        "tilt_end_mean_deg": round(float(tilt_end.mean()), 1),
+        "recovered_ratio": round(
+            float((started_down & (z_end > 0.10)).sum() / max(started_down.sum(), 1)), 3
+        ),
+        "standing_ratio": round(float(standing.mean()), 3),
+        "crouched_ratio": round(float(crouched.mean()), 3),
+        "down_ratio": round(float(1 - standing.mean() - crouched.mean()), 3),
+    }
+    if frames:
+        import imageio.v2 as imageio
+
+        imageio.mimsave(video, frames, fps=int(control_hz))
+        print(f"video: {video} ({len(frames)} frames)")
+        result["video"] = str(video)
+    return result
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--task", required=True)
+    ap.add_argument("--onnx", required=True)
+    ap.add_argument("--device", default="cuda:0")
+    ap.add_argument("--num-envs", type=int, default=32)
+    ap.add_argument("--seconds", type=float, default=6.0)
+    ap.add_argument("--control-hz", type=float, default=50.0)
+    ap.add_argument("--force-state", choices=(*STATES, "all"), default=None,
+                    help="force every env to start in this ground state; 'all' loops the four")
+    ap.add_argument("--video", default=None, help="write an mp4 (first 200 control steps)")
+    ap.add_argument("--out", default=None)
+    args = ap.parse_args(argv)
+
+    states = STATES if args.force_state == "all" else (args.force_state,)
+    results = []
+    for state in states:
+        video = args.video
+        if video and len(states) > 1:
+            video = f"{Path(video).with_suffix('')}_{state}.mp4"
+        results.append(
+            probe(args.task, args.onnx, args.device, args.num_envs, args.seconds,
+                  args.control_hz, state, video)
+        )
+
+    if len(results) > 1:
+        hdr = f"{'state':10s}{'z_start':>9}{'z_end':>8}{'tilt':>7}{'recovered':>11}{'standing':>10}{'down':>7}"
+        print(hdr)
+        print("-" * len(hdr))
+        for r in results:
+            print(f"{r['forced_state']:10s}{r['z_start_mean']:9.3f}{r['z_end_mean']:8.3f}"
+                  f"{r['tilt_end_mean_deg']:7.1f}{r['recovered_ratio']:11.2f}"
+                  f"{r['standing_ratio']:10.2f}{r['down_ratio']:7.2f}")
+        print()
+    for r in results:
+        print(json.dumps(r, ensure_ascii=False))
+
+    if args.out:
+        Path(args.out).write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"wrote {args.out}")
     return 0
 
 

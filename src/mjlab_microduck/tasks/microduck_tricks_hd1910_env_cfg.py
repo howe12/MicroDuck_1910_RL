@@ -58,7 +58,28 @@ def _swap_robot(cfg: ManagerBasedRlEnvCfg) -> ManagerBasedRlEnvCfg:
 def make_microduck_standup_hd1910_env_cfg(
     play: bool = False, rough: bool = False
 ) -> ManagerBasedRlEnvCfg:
-    return _swap_robot(make_microduck_standup_env_cfg(play=play, rough=rough))
+    cfg = _swap_robot(make_microduck_standup_env_cfg(play=play, rough=rough))
+
+    # face-up (supine) earlier than upstream. Measured on the 300-iteration
+    # probe: prone 100% and sitting 100% recovery, but supine 0% — because the
+    # default curriculum keeps face_up_prob at 0 until iteration 600 and the
+    # probe policy had never seen the pose. The duck is head-heavy (38% of the
+    # mass), so falling on its back is common in the real world and cannot wait.
+    # Upstream's own notes record the same failure ("face-up froze into do
+    # nothing"), so this keeps their shape but pulls the hard pose forward.
+    stages = [
+        # step,        standing, sitting, face_down, face_up
+        {"step": 0,        "params": {"standing_prob": 0.50, "sitting_prob": 0.30,
+                                      "face_down_prob": 0.20, "face_up_prob": 0.00}},
+        {"step": 200 * 24, "params": {"standing_prob": 0.30, "sitting_prob": 0.25,
+                                      "face_down_prob": 0.25, "face_up_prob": 0.20}},
+        {"step": 700 * 24, "params": {"standing_prob": 0.25, "sitting_prob": 0.20,
+                                      "face_down_prob": 0.25, "face_up_prob": 0.30}},
+        {"step": 1200 * 24, "params": {"standing_prob": 0.20, "sitting_prob": 0.20,
+                                       "face_down_prob": 0.25, "face_up_prob": 0.35}},
+    ]
+    cfg.curriculum["ground_state_mix"].params["param_stages"] = stages
+    return cfg
 
 
 def make_microduck_velstand_hd1910_env_cfg(
