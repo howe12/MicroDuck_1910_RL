@@ -27,6 +27,7 @@ def apply_velocity_rebalance(
     track_linear_weight: float = 4.0,
     head_pose_weight: float = 1.0,
     no_progress_weight: float = 1.5,
+    no_turn_progress_weight: float = 0.0,
     air_time_continuous: bool = False,
     air_time_target: float = 0.15,
 ):
@@ -70,4 +71,10 @@ def apply_velocity_rebalance(
         weight=no_progress_weight,
         params={"command_name": "twist", "min_speed": 0.02},
     )
+    if no_turn_progress_weight > 0.0:
+        cfg.rewards["no_turn_progress"] = RewardTermCfg(
+            func=microduck_mdp.no_turn_progress_penalty,
+            weight=no_turn_progress_weight,
+            params={"command_name": "twist"},
+        )
     return cfg

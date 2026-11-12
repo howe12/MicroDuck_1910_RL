@@ -7386,3 +7386,36 @@ def feet_air_time_continuous(
         reward = reward * upright
 
     return reward
+
+
+def no_turn_progress_penalty(
+    env: ManagerBasedRlEnv,
+    command_name: str = "twist",
+    command_deadzone: float = 0.05,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+) -> torch.Tensor:
+    """Shortfall in achieving the commanded YAW RATE, as a penalty in [-1, 0].
+
+    The angular twin of :func:`no_progress_penalty`, added after run 3b's
+    mid-run evaluation showed the asymmetry: forward tracking recovered
+    (0.02 -> 0.18 at a 0.15 command) while slow turning stayed at 0.02 rad/s
+    against a 0.30 command, even though fast turning (0.80) worked.
+
+    The reason is the same free-credit problem the linear term had: the angular
+    tracking Gaussian uses std=sqrt(0.5)=0.71, so standing still under a 0.30
+    rad/s command still earns exp(-0.09/0.5)=0.84 of that term. A continuous
+    shortfall removes the free lunch without touching the Gaussian's gradient.
+
+    Self-negating (returns <= 0) → register with a POSITIVE weight.
+    """
+    command = env.command_manager.get_command(command_name)
+    asset: Entity = env.scene[asset_cfg.name]
+    cmd_w = command[:, 2]
+    cmd_abs = torch.abs(cmd_w)
+    actual_w = asset.data.root_link_ang_vel_b[:, 2]
+    # Progress measured along the commanded direction: turning the wrong way
+    # counts as zero progress, not as negative progress.
+    along = torch.sign(cmd_w) * actual_w
+    shortfall = torch.clamp(1.0 - along / torch.clamp(cmd_abs, min=1e-6), 0.0, 1.0)
+    active = (cmd_abs > command_deadzone).to(actual_w.dtype)
+    return -(shortfall * active)

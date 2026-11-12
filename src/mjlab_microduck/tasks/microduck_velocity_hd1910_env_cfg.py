@@ -113,7 +113,12 @@ def make_microduck_velocity_hd1910_env_cfg(
     # robot ~5.1 of the ~6.5 available reward; walking adds ~0.6 but risks it
     # all. These four changes flip the economics — see the block at the bottom
     # of tasks/mdp.py for the measurements behind them.
-    hd1910_tuning.apply_velocity_rebalance(cfg)
+    hd1910_tuning.apply_velocity_rebalance(
+        cfg,
+        # run 3c: 慢速转向仍是 0.02/0.30，而快速转向正常（0.50/0.80）。
+        # 与线性轴同一个病根——角速度高斯 std=0.71 太宽，站着不动也能拿 84%。
+        no_turn_progress_weight=1.0,
+    )
     # ── run-3: 补原地转向 (2026-11-12) ─────────────────────────────────────
     # 分轴评估显示 run 2 的线性轴很好（前向 0.33/0.40、后向 0.19/0.20、横移
     # 0.17/0.20），但原地转向完全不会：指令 0.3 和 0.8 rad/s 都只到 0.01~0.12，
