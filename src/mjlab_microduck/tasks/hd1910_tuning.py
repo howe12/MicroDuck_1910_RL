@@ -26,7 +26,7 @@ def apply_velocity_rebalance(
     air_time_progress: bool = True,
     track_linear_weight: float = 4.0,
     head_pose_weight: float = 1.0,
-    no_progress_weight: float = 0.5,
+    no_progress_weight: float = 1.5,
 ):
     """Make walking worth more than standing, on the HD-1910 dynamics.
 
@@ -42,6 +42,9 @@ def apply_velocity_rebalance(
     if air_time_progress:
         cfg.rewards["air_time"].func = microduck_mdp.feet_air_time_with_progress
 
+    # 1.5 x dt(0.02) = 0.03/step at full standstill, vs 0.067/step the tracking
+    # Gaussian still pays for standing under a 0.15 m/s command. Run 3 measured
+    # that 0.5 was 8x too weak to matter.
     cfg.rewards["no_progress"] = RewardTermCfg(
         func=microduck_mdp.no_progress_penalty,
         # Self-negating function -> POSITIVE weight (see AGENTS.md).

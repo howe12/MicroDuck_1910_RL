@@ -1,0 +1,138 @@
+[
+  {
+    "bucket": "stand",
+    "cmd": {
+      "vx": 0.0,
+      "vy": 0.0,
+      "wz": 0.0
+    },
+    "achieved_vx": 0.0,
+    "achieved_vy": 0.0,
+    "achieved_wz": 0.002,
+    "err_vx": 0.001,
+    "err_vy": 0.0,
+    "err_wz": 0.004,
+    "trunk_z_m": 0.116,
+    "tilt_deg": 0.7,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "fwd_slow",
+    "cmd": {
+      "vx": 0.15,
+      "vy": 0.0,
+      "wz": 0.0
+    },
+    "achieved_vx": 0.023,
+    "achieved_vy": 0.0,
+    "achieved_wz": 0.02,
+    "err_vx": 0.127,
+    "err_vy": 0.011,
+    "err_wz": 0.033,
+    "trunk_z_m": 0.115,
+    "tilt_deg": 0.9,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "fwd_fast",
+    "cmd": {
+      "vx": 0.4,
+      "vy": 0.0,
+      "wz": 0.0
+    },
+    "achieved_vx": 0.338,
+    "achieved_vy": -0.01,
+    "achieved_wz": 0.028,
+    "err_vx": 0.062,
+    "err_vy": 0.065,
+    "err_wz": 0.119,
+    "trunk_z_m": 0.117,
+    "tilt_deg": 1.9,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "back",
+    "cmd": {
+      "vx": -0.2,
+      "vy": 0.0,
+      "wz": 0.0
+    },
+    "achieved_vx": -0.192,
+    "achieved_vy": 0.0,
+    "achieved_wz": 0.022,
+    "err_vx": 0.015,
+    "err_vy": 0.061,
+    "err_wz": 0.074,
+    "trunk_z_m": 0.118,
+    "tilt_deg": 1.6,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "lat",
+    "cmd": {
+      "vx": 0.0,
+      "vy": 0.2,
+      "wz": 0.0
+    },
+    "achieved_vx": -0.002,
+    "achieved_vy": 0.155,
+    "achieved_wz": -0.026,
+    "err_vx": 0.006,
+    "err_vy": 0.068,
+    "err_wz": 0.112,
+    "trunk_z_m": 0.118,
+    "tilt_deg": 2.2,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "wz_slow",
+    "cmd": {
+      "vx": 0.0,
+      "vy": 0.0,
+      "wz": 0.3
+    },
+    "achieved_vx": 0.0,
+    "achieved_vy": -0.0,
+    "achieved_wz": 0.011,
+    "err_vx": 0.001,
+    "err_vy": 0.0,
+    "err_wz": 0.289,
+    "trunk_z_m": 0.116,
+    "tilt_deg": 0.9,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "wz",
+    "cmd": {
+      "vx": 0.0,
+      "vy": 0.0,
+      "wz": 0.8
+    },
+    "achieved_vx": -0.0,
+    "achieved_vy": -0.001,
+    "achieved_wz": 0.576,
+    "err_vx": 0.006,
+    "err_vy": 0.015,
+    "err_wz": 0.237,
+    "trunk_z_m": 0.117,
+    "tilt_deg": 1.7,
+    "fall_ratio": 0.0
+  },
+  {
+    "bucket": "mix",
+    "cmd": {
+      "vx": 0.25,
+      "vy": 0.1,
+      "wz": 0.4
+    },
+    "achieved_vx": 0.229,
+    "achieved_vy": 0.075,
+    "achieved_wz": 0.354,
+    "err_vx": 0.022,
+    "err_vy": 0.081,
+    "err_wz": 0.096,
+    "trunk_z_m": 0.117,
+    "tilt_deg": 1.5,
+    "fall_ratio": 0.0
+  }
+]

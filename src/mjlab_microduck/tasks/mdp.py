@@ -7252,7 +7252,17 @@ def no_progress_penalty(
     command_deadzone: float = 0.05,
     asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
 ) -> torch.Tensor:
-    """-1 for every env that has a walking command but is not moving with it.
+    """Shortfall in achieving the commanded forward speed, as a penalty in [-1, 0].
+
+    ``-relu(1 - along/|cmd|)``: zero when the robot matches the command, -1 when
+    it stands still.
+
+    Run 3 measured why the earlier binary version was useless: a 0.15 m/s
+    command with a 0.02 m/s creep dodged the ``along < min_speed`` test
+    entirely, and even a full standstill only earned -0.01/step against the
+    0.067/step the Gaussian tracking term still paid at that error. The
+    shortfall form is continuous, so "creep just enough to dodge the flag"
+    stops working.
 
     Self-negating (returns <= 0) → register with a POSITIVE weight, per the
     sign convention in AGENTS.md. Zero-command envs (the deployment idle state)
@@ -7264,8 +7274,9 @@ def no_progress_penalty(
     cmd_norm = torch.norm(cmd_xy, dim=1)
     vel = asset.data.root_link_lin_vel_b[:, :2]
     along = (vel * cmd_xy).sum(dim=1) / torch.clamp(cmd_norm, min=1e-6)
-    stalled = (cmd_norm > command_deadzone) & (along < min_speed)
-    return -stalled.to(vel.dtype)
+    shortfall = torch.clamp(1.0 - along / torch.clamp(cmd_norm, min=1e-6), 0.0, 1.0)
+    active = (cmd_norm > command_deadzone).to(vel.dtype)
+    return -(shortfall * active)
 
 
 def weight_override_curriculum(
