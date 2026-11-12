@@ -27,6 +27,26 @@ import numpy as np
 import torch
 
 
+def _closeup_viewer(width: int = 480):
+    """Track the trunk at ~45 cm so the 25 cm robot fills the frame.
+
+    The default ViewerConfig (distance 5 m, 320x240, 2 extra envs) renders the
+    robot as a handful of pixels surrounded by neighbours — useless for review.
+    """
+    from mjlab.viewer.viewer_config import ViewerConfig
+
+    return ViewerConfig(
+        origin_type=ViewerConfig.OriginType.ASSET_BODY,
+        entity_name="robot",
+        body_name="trunk_base",
+        distance=0.45,
+        elevation=-12.0,
+        azimuth=135.0,
+        height=width,
+        width=width,
+        max_extra_envs=0,
+    )
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--task", required=True)
@@ -57,8 +77,13 @@ def main(argv=None) -> int:
         if ev is not None:
             ev.params.update(face_down_prob=1.0, face_up_prob=0.0,
                              sitting_prob=0.0, standing_prob=0.0)
+            # The ground_state_mix curriculum rewrites those probabilities on
+            # every step — drop it or the override survives exactly one reset.
+            cfg.curriculum.pop("ground_state_mix", None)
     if args.video:
         cfg.scene.num_envs = min(args.num_envs, 8)
+    if args.video:
+        cfg.viewer = _closeup_viewer()
     env = ManagerBasedRlEnv(cfg=cfg, device=args.device,
                             render_mode="rgb_array" if args.video else None)
     robot = env.scene["robot"]

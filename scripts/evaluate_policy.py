@@ -55,6 +55,8 @@ def build_env(task: str, device: str, num_envs: int, render: bool = False):
     # silently overwritten. Evaluation wants the raw yaw rate.
     cfg.commands["twist"].heading_command = False
     cfg.commands["twist"].ranges.heading = None
+    if render:
+        cfg.viewer = _closeup_viewer()
     return ManagerBasedRlEnv(cfg=cfg, device=device, render_mode="rgb_array" if render else None)
 
 
@@ -132,6 +134,26 @@ def run_bucket(env, sess, name, vec, seconds, control_hz=50.0, record=False):
         "_frames": frames,
     }
 
+
+def _closeup_viewer(width: int = 480):
+    """Track the trunk at ~45 cm so the 25 cm robot fills the frame.
+
+    The default ViewerConfig (distance 5 m, 320x240, 2 extra envs) renders the
+    robot as a handful of pixels surrounded by neighbours — useless for review.
+    """
+    from mjlab.viewer.viewer_config import ViewerConfig
+
+    return ViewerConfig(
+        origin_type=ViewerConfig.OriginType.ASSET_BODY,
+        entity_name="robot",
+        body_name="trunk_base",
+        distance=0.45,
+        elevation=-12.0,
+        azimuth=135.0,
+        height=width,
+        width=width,
+        max_extra_envs=0,
+    )
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
