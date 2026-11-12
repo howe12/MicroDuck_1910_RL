@@ -72,6 +72,11 @@ def main(argv=None) -> int:
     cfg = load_env_cfg(args.task)
     cfg.scene.num_envs = min(args.num_envs, 8) if args.video else args.num_envs
     cfg.auto_reset = False  # keep the whole attempt, a reset would hide a botched landing
+    # The task's own episode is 5 s; a longer measurement window would trip the
+    # time_out termination and step() then refuses (auto_reset=False). The
+    # measurement is pitch-based, so the task's termination logic is not needed.
+    cfg.terminations = {}
+    cfg.episode_length_s = args.seconds + 5.0
     if args.video:
         cfg.viewer = _closeup_viewer()
 
