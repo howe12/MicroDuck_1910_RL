@@ -31,6 +31,14 @@ from .microduck_velocity_hd1910_env_cfg import (
     make_microduck_velocity_hd1910_env_cfg,
     MicroduckHd1910RlCfg,
 )
+from .microduck_tricks_hd1910_env_cfg import (
+    make_microduck_roulade_hd1910_env_cfg,
+    make_microduck_standup_hd1910_env_cfg,
+    make_microduck_velstand_hd1910_env_cfg,
+    MicroduckRouladeHd1910RlCfg,
+    MicroduckStandUpHd1910RlCfg,
+    MicroduckVelStandHd1910RlCfg,
+)
 from .microduck_standup_env_cfg import (
     make_microduck_standup_env_cfg,
     MicroduckStandUpRlCfg,
@@ -106,6 +114,32 @@ register_mjlab_task(
     env_cfg=make_microduck_velocity_hd1910_env_cfg(rough=True),
     play_env_cfg=make_microduck_velocity_hd1910_env_cfg(play=True, rough=True),
     rl_cfg=MicroduckHd1910RlCfg,
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+# ── HD1910 episodic tricks (full-collision model) ──────────────────────────
+# Separate experiment dirs so their curves never mix with the XL330 runs.
+register_mjlab_task(
+    task_id="Mjlab-StandUp-Flat-MicroDuck-HD1910",
+    env_cfg=make_microduck_standup_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_standup_hd1910_env_cfg(play=True),
+    rl_cfg=MicroduckStandUpHd1910RlCfg,
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+register_mjlab_task(
+    task_id="Mjlab-VelStand-Flat-MicroDuck-HD1910",
+    env_cfg=make_microduck_velstand_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_velstand_hd1910_env_cfg(play=True),
+    rl_cfg=MicroduckVelStandHd1910RlCfg,
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+register_mjlab_task(
+    task_id="Mjlab-Roulade-Flat-MicroDuck-HD1910",
+    env_cfg=make_microduck_roulade_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_roulade_hd1910_env_cfg(play=True),
+    rl_cfg=MicroduckRouladeHd1910RlCfg,
     runner_cls=MicroduckOnPolicyRunner,
 )
 
