@@ -1,0 +1,50 @@
+[
+  {
+    "forced_state": "down",
+    "z_start_mean": 0.0716,
+    "started_down_ratio": 1.0,
+    "z_end_mean": 0.1162,
+    "z_max_reached_mean": 0.1171,
+    "tilt_end_mean_deg": 0.8,
+    "recovered_ratio": 1.0,
+    "standing_ratio": 1.0,
+    "crouched_ratio": 0.0,
+    "down_ratio": 0.0
+  },
+  {
+    "forced_state": "up",
+    "z_start_mean": 0.0701,
+    "started_down_ratio": 1.0,
+    "z_end_mean": 0.1162,
+    "z_max_reached_mean": 0.1178,
+    "tilt_end_mean_deg": 1.0,
+    "recovered_ratio": 1.0,
+    "standing_ratio": 1.0,
+    "crouched_ratio": 0.0,
+    "down_ratio": 0.0
+  },
+  {
+    "forced_state": "sitting",
+    "z_start_mean": 0.0694,
+    "started_down_ratio": 1.0,
+    "z_end_mean": 0.1162,
+    "z_max_reached_mean": 0.1211,
+    "tilt_end_mean_deg": 0.8,
+    "recovered_ratio": 1.0,
+    "standing_ratio": 1.0,
+    "crouched_ratio": 0.0,
+    "down_ratio": 0.0
+  },
+  {
+    "forced_state": "standing",
+    "z_start_mean": 0.1146,
+    "started_down_ratio": 0.0,
+    "z_end_mean": 0.1162,
+    "z_max_reached_mean": 0.1182,
+    "tilt_end_mean_deg": 0.8,
+    "recovered_ratio": 0.0,
+    "standing_ratio": 1.0,
+    "crouched_ratio": 0.0,
+    "down_ratio": 0.0
+  }
+]

@@ -92,16 +92,30 @@ uv run --no-sync scripts/accept_velocity.py --onnx policies/hd1910_v3_walk.onnx 
 
 ## 2. StandUp（起身）
 
-| 起始姿态 | 300 轮策略实测 | 目标 |
-|---|---:|---|
-| 趴地 face-down | **100%** | ≥90% |
-| 坐着 sitting | 81–100% | ≥90% |
-| **仰面 face-up** | **0%** | **≥80%** |
-| 站立 standing（保持） | 100% | ≥95% |
+### 最终结果（1500 轮，24 环境 × 6 s）
 
-**判定**：仰面未达标。原因已定位——300 轮时 `face_up_prob = 0`，该姿态从未出现在
-训练分布里（上游课程 iter 600 才引入 10%）。已把 HD1910 版课程表改为
-iter 200 起 20%、700 起 30%、1200 起 35%，待 1500 轮训练后复测。
+| 起始姿态 | 300 轮探针 | **1500 轮正式** | 目标 | 判定 |
+|---|---:|---:|---|---|
+| 趴地 face-down | 100% | **100%** | ≥90% | ✅ |
+| 坐着 sitting | 81–100% | **100%** | ≥90% | ✅ |
+| **仰面 face-up** | **0%** | **100%** | ≥80% | ✅ |
+| 站立 standing（保持） | 100% | **100%** | ≥95% | ✅ |
+
+终态高度 0.1162 m（HOME 0.1159），倾角 **0.8–1.0°**，全部姿态零残留倒地。
+
+**仰面从 0% 到 100% 的关键改动**：把 `ground_state_mix` 课程的 `face_up_prob`
+从"iter 600 才 10%"提前到 **iter 200 就 20%**（700→30%、1200→35%）。
+300 轮探针时该姿态从未进入训练分布，所以策略"看见背躺就装死"。
+
+![仰面起身](/tmp/frames/supine_ok.png)
+
+验收命令：
+
+```bash
+uv run --no-sync scripts/probe_policy_state.py \
+  --task Mjlab-StandUp-Flat-MicroDuck-HD1910 --onnx policies/hd1910_standup.onnx \
+  --force-state all --out docs/hd1910/artifacts/standup_accept.json
+```
 
 验收命令：
 
@@ -169,5 +183,7 @@ uv run --no-sync scripts/accept_roulade.py --onnx policies/roulade.onnx \
 | `docs/hd1910/videos/standup_from_supine_FAIL.mp4` | 仰面起不来（失败证据） |
 | `policies/hd1910_v2_walk_candidate.onnx` | run 2 策略（会走，不会原地转） |
 | `policies/hd1910_v3_walk.onnx` | **run 3 策略：线性四轴达标 + 原地转向 0.99 rad/s** |
+| `policies/hd1910_standup.onnx` | **起身策略：趴/坐/仰三姿态 100% 恢复** |
+| `docs/hd1910/videos/standup_from_supine_OK.mp4` | 仰面起身成功（对比 `_FAIL` 那段） |
 | `docs/hd1910/videos/accept_wz.mp4` | 原地转向特写 |
 | `docs/hd1910/videos/accept_fwd_fast.mp4` | 0.4 m/s 行走特写 |
