@@ -7316,3 +7316,73 @@ def weight_override_curriculum(
         except Exception:
             pass
     return torch.tensor([float(applied)], device=env.device)
+
+
+def feet_air_time_continuous(
+    env: ManagerBasedRlEnv,
+    sensor_name: str,
+    target_air_time: float = 0.15,
+    command_name: str | None = None,
+    command_threshold: float = 0.01,
+    gate_tilt_above_deg: float | None = None,
+    min_progress: float | None = None,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+) -> torch.Tensor:
+    """Air-time reward with a *ramp* instead of a window.
+
+    The template ``feet_air_time`` only counts feet whose current air time lands
+    inside ``(threshold_min, threshold_max)`` — a cliff. Measured on the HD-1910
+    walk policy (evaluate_policy.py, 0.4 m/s bucket): mean air time 0.054 s, best
+    0.090 s, while the window starts at 0.125 s. The term (weight 3.0, the third
+    largest) therefore never paid, so it applied no pressure to lift the feet and
+    the gait settled into a 9 mm shuffle.
+
+    Here each foot contributes ``clamp(air_time / target, 0, 1)``, so lengthening
+    a step always pays a little more. Same 0..nfeet output range as the template,
+    so existing weights stay meaningful.
+
+    Args:
+        target_air_time: air time that earns full credit for a foot.
+        gate_tilt_above_deg: zero the term while the trunk is tilted past this
+            (replaces ``feet_air_time_upright``'s exploit guard).
+        min_progress: zero the term unless the robot is displacing along the
+            command (replaces ``feet_air_time_with_progress``'s gate).
+    """
+    sensor = env.scene[sensor_name]
+    sensor_data = sensor.data
+    air_time = sensor_data.current_air_time
+    assert air_time is not None
+
+    per_foot = torch.clamp(air_time / max(target_air_time, 1e-6), 0.0, 1.0)
+    reward = torch.sum(per_foot, dim=1)
+
+    # Keep the diagnostic the template publishes.
+    in_air = air_time > 0
+    num_in_air = torch.sum(in_air.float())
+    mean_air = torch.sum(air_time * in_air.float()) / torch.clamp(num_in_air, min=1)
+    env.extras["log"]["Metrics/air_time_mean"] = mean_air
+
+    asset: Entity = env.scene[asset_cfg.name]
+
+    if command_name is not None:
+        command = env.command_manager.get_command(command_name)
+        if command is not None:
+            linear_norm = torch.norm(command[:, :2], dim=1)
+            scale = (linear_norm > command_threshold).to(reward.dtype)
+            reward = reward * scale
+
+            if min_progress is not None:
+                vel = asset.data.root_link_lin_vel_b[:, :2]
+                cmd_xy = command[:, :2]
+                cmd_norm = torch.norm(cmd_xy, dim=1)
+                along = (vel * cmd_xy).sum(dim=1) / torch.clamp(cmd_norm, min=1e-6)
+                needs_motion = cmd_norm > 0.05
+                gate = torch.where(needs_motion, (along > min_progress).to(reward.dtype),
+                                   torch.ones_like(along))
+                reward = reward * gate
+
+    if gate_tilt_above_deg is not None:
+        upright = 1.0 - _fallen_mask(env, asset, 0.0, gate_tilt_above_deg)
+        reward = reward * upright
+
+    return reward

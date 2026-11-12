@@ -27,6 +27,8 @@ def apply_velocity_rebalance(
     track_linear_weight: float = 4.0,
     head_pose_weight: float = 1.0,
     no_progress_weight: float = 1.5,
+    air_time_continuous: bool = False,
+    air_time_target: float = 0.15,
 ):
     """Make walking worth more than standing, on the HD-1910 dynamics.
 
@@ -39,7 +41,24 @@ def apply_velocity_rebalance(
     cfg.rewards["track_linear_velocity"].weight = track_linear_weight
     cfg.rewards["head_pose_tracking"].weight = head_pose_weight
 
-    if air_time_progress:
+    if air_time_continuous:
+        # Ramp instead of the template's (0.125, 0.30) window. Measured air time
+        # on the HD-1910 gait is 0.054 s mean / 0.090 s best, i.e. entirely below
+        # the window — the term never paid and the feet stayed at 9 mm.
+        at = cfg.rewards["air_time"]
+        cfg.rewards["air_time"] = RewardTermCfg(
+            func=microduck_mdp.feet_air_time_continuous,
+            weight=at.weight,
+            params={
+                "sensor_name": at.params.get("sensor_name", "feet_ground_contact"),
+                "target_air_time": air_time_target,
+                "command_name": "twist",
+                "command_threshold": 0.01,
+                "min_progress": 0.02 if air_time_progress else None,
+                "gate_tilt_above_deg": None if air_time_progress else 40.0,
+            },
+        )
+    elif air_time_progress:
         cfg.rewards["air_time"].func = microduck_mdp.feet_air_time_with_progress
 
     # 1.5 x dt(0.02) = 0.03/step at full standstill, vs 0.067/step the tracking
