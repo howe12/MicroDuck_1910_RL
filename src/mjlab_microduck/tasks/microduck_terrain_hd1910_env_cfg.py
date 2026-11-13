@@ -44,7 +44,12 @@ from mjlab_microduck.robot.microduck_constants import (
     MICRODUCK_WALK_HD1910_ROBOT_CFG,
 )
 
-TILE_SIZE = (14.0, 6.0)  # (width, height); width must fit flat+ramp_max+runout = 13 m
+# (width, height). Width must fit flat+ramp_max+runout = 13 m. Height was 6 m in
+# the first slope run and 11.5 out-of-terrain terminations per iteration (vs 0.17
+# falls) drowned the signal: with lateral commands up to +-0.3 m/s a robot leaves
+# a 6 m wide tile in ~10 s, so most episodes ended by walking into the void
+# rather than by walking badly. 12 m keeps it on the tile for a full episode.
+TILE_SIZE = (14.0, 12.0)
 
 # Ramps are walked BOTH ways: the robot spawns on the flat run-up, the command
 # resamples as it goes, so it climbs, descends and traverses at random. 2 deg at
