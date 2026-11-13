@@ -92,7 +92,17 @@ def make_microduck_velstand_hd1910_env_cfg(
     # run 1 stand still on the HD-1910. Apply the run-2 rebalance, but keep
     # VelStand's own air_time (it gates on upright so a fallen robot cannot farm
     # it by shaking a leg).
-    hd1910_tuning.apply_velocity_rebalance(cfg, air_time_progress=False)
+    hd1910_tuning.apply_velocity_rebalance(
+        cfg,
+        air_time_progress=False,
+        # Plan A: VelStand walks and recovers (measured 100% recovery, 0.27 m/s)
+        # but cannot turn at all (0.03 rad/s against a 0.80 command) because its
+        # walk layer came from the run-2 recipe. Add the run-3 turning settings
+        # so ONE policy covers walk + turn + fall + recover.
+        no_turn_progress_weight=1.0,
+    )
+    cfg.rewards["track_angular_velocity"].weight = 3.0
+    cfg.commands["twist"].rel_turn_in_place_envs = 0.35
     return cfg
 
 
