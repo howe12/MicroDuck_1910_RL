@@ -304,6 +304,43 @@ uv run --no-sync scripts/accept_velocity.py \
 
 判据：与平地相比，`fwd_fast` 达成速度下降不超过 30%，且 `fall_ratio ≤ 0.10`。
 
+## 6. 综合策略 `hd1910_walk_all.onnx`（走 + 转 + 摔 + 爬起来）
+
+方案 A：从 VelStand `model_3999` 续训 2500 轮，补上 run-3 的转向设置
+（`track_angular_velocity 3.0`、`rel_turn_in_place_envs 0.35`、`no_turn_progress 1.0`）。
+
+### 能力一：运动（16 环境 × 6 s）
+
+| 指令桶 | 实测 | 判定 |
+|---|---:|---|
+| 前进 0.40 | **0.36** | ✅ |
+| 前进 0.15 | 0.17 | ✅ |
+| 后退 −0.20 | −0.21 | ✅ |
+| 横移 0.20 | 0.16 | ✅ |
+| **原地转 0.80** | **0.98** | ✅ |
+| 慢转 0.30 | 0.02 | ❌ |
+| 混合 | 0.26 / 0.08 / 0.45 | — |
+
+**转向从 0.03 提到 0.98**——这是续训真正换来的东西。
+
+### 能力二：打翻后恢复（16 环境）
+
+| 指标 | 实测 |
+|---|---:|
+| 行走速度 | 0.259 m/s |
+| 打翻率 | 1.0 |
+| **恢复率** | **1.00** |
+| 恢复时间中位 / p90 | **0.30 s / 0.86 s** |
+| 终态站立 | 1.00 |
+| 恢复后速度 | 0.239 m/s |
+
+![走→打翻→爬起](/tmp/frames/walk_all.png)
+
+**一个 ONNX 同时具备：走、转、被打翻、自己爬起、继续走**，且恢复后速度几乎无损。
+这就是"把技能塞进同一个 MDP"路线的成品——不需要门控、不需要状态机。
+
+唯一仍未解决的：慢速转向（0.30 rad/s）依然为 0，与平地/斜坡的结论一致。
+
 ## 附：数据与视频索引
 
 | 文件 | 内容 |
@@ -322,6 +359,8 @@ uv run --no-sync scripts/accept_velocity.py \
 | `policies/hd1910_roulade.onnx` | **前滚翻：42% 完整翻滚，100% 落地站住** |
 | `docs/hd1910/videos/roulade.mp4` | 前滚翻实拍 |
 | `docs/hd1910/artifacts/roulade_accept.json` | 64 环境验收数据 |
+| **`policies/hd1910_walk_all.onnx`** | **综合策略：走 + 转(0.98) + 打翻后 100% 爬起** |
+| `docs/hd1910/videos/walk_all_knockdown.mp4` | 走→打翻→爬起→继续走 |
 | `policies/hd1910_rough.onnx` | **不平路面：7/7 全过，含慢速转向** |
 | `policies/hd1910_slope_v2.onnx` | 斜坡：线性 4 项达标，转向未学会 |
 | `docs/hd1910/videos/rough_walk_closeup.mp4` | 不平路面行走特写 |

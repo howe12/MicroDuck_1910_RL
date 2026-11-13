@@ -1,0 +1,11 @@
+{
+  "onnx": "policies/hd1910_walk_all.onnx",
+  "cmd_vx": 0.25,
+  "walk_speed_mps": 0.259,
+  "knocked_down_ratio": 1.0,
+  "recovered_ratio": 1.0,
+  "recovery_time_median_s": 0.3,
+  "recovery_time_p90_s": 0.86,
+  "standing_at_end_ratio": 1.0,
+  "post_recovery_speed_mps": 0.239
+}
