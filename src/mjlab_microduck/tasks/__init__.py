@@ -31,6 +31,16 @@ from .microduck_velocity_hd1910_env_cfg import (
     make_microduck_velocity_hd1910_env_cfg,
     MicroduckHd1910RlCfg,
 )
+from .microduck_skills_hd1910_env_cfg import (
+    make_microduck_ball_kick_hd1910_env_cfg,
+    make_microduck_ground_pick_hd1910_env_cfg,
+    make_microduck_sitstand_hd1910_env_cfg,
+    make_microduck_spin_hd1910_env_cfg,
+    MicroduckBallKickHd1910RlCfg,
+    MicroduckGroundPickHd1910RlCfg,
+    MicroduckSitStandHd1910RlCfg,
+    MicroduckSpinHd1910RlCfg,
+)
 from .microduck_terrain_hd1910_env_cfg import (
     make_microduck_velocity_slope_hd1910_env_cfg,
     MicroduckHd1910SlopeRlCfg,
@@ -126,6 +136,39 @@ register_mjlab_task(
     env_cfg=make_microduck_velocity_slope_hd1910_env_cfg(),
     play_env_cfg=make_microduck_velocity_slope_hd1910_env_cfg(play=True),
     rl_cfg=MicroduckHd1910SlopeRlCfg,
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+# ── HD1910 skills ──────────────────────────────────────────────────────────
+register_mjlab_task(
+    task_id="Mjlab-SitStand-Flat-MicroDuck-HD1910",
+    env_cfg=make_microduck_sitstand_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_sitstand_hd1910_env_cfg(play=True),
+    rl_cfg=MicroduckSitStandHd1910RlCfg,
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+register_mjlab_task(
+    task_id="Mjlab-BallKick-Flat-MicroDuck-HD1910",
+    env_cfg=make_microduck_ball_kick_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_ball_kick_hd1910_env_cfg(play=True),
+    rl_cfg=MicroduckBallKickHd1910RlCfg,
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+register_mjlab_task(
+    task_id="Mjlab-GroundPick-Flat-MicroDuck-HD1910",
+    env_cfg=make_microduck_ground_pick_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_ground_pick_hd1910_env_cfg(play=True),
+    rl_cfg=MicroduckGroundPickHd1910RlCfg,
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+register_mjlab_task(
+    task_id="Mjlab-Spin-Flat-MicroDuck-HD1910",
+    env_cfg=make_microduck_spin_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_spin_hd1910_env_cfg(play=True),
+    rl_cfg=MicroduckSpinHd1910RlCfg,
     runner_cls=MicroduckOnPolicyRunner,
 )
 
