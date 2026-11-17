@@ -33,14 +33,14 @@ SIT_Z = 0.060
 UPRIGHT_TILT_DEG = 25.0
 
 
-def _closeup(width: int = 480):  # pragma: no cover - viewer helper
+def _closeup(width: int = 480, distance: float = 0.45):  # pragma: no cover
     from mjlab.viewer.viewer_config import ViewerConfig
 
     return ViewerConfig(
         origin_type=ViewerConfig.OriginType.ASSET_BODY,
         entity_name="robot",
         body_name="trunk_base",
-        distance=0.45,
+        distance=distance,
         elevation=-12.0,
         azimuth=135.0,
         height=width,
@@ -63,6 +63,9 @@ def main(argv=None) -> int:
     ap.add_argument("--device", default="cuda:0")
     ap.add_argument("--num-envs", type=int, default=16)
     ap.add_argument("--seconds", type=float, default=6.0)
+    ap.add_argument("--video", default=None, help="record this skill to an mp4")
+    ap.add_argument("--cam-distance", type=float, default=0.45,
+                    help="camera distance in m; ball kick needs ~1.2 to keep the ball in frame")
     ap.add_argument("--out", default=None)
     args = ap.parse_args(argv)
 
@@ -80,7 +83,11 @@ def main(argv=None) -> int:
     cfg.terminations = {}          # a fall must not end the attempt we are measuring
     cfg.episode_length_s = args.seconds + 5.0
 
-    env = ManagerBasedRlEnv(cfg=cfg, device=args.device)
+    if args.video:
+        cfg.scene.num_envs = min(args.num_envs, 6)
+        cfg.viewer = _closeup(distance=args.cam_distance)
+    env = ManagerBasedRlEnv(cfg=cfg, device=args.device,
+                            render_mode="rgb_array" if args.video else None)
     robot = env.scene["robot"]
     n = env.num_envs
     steps = int(args.seconds * 50)
@@ -91,8 +98,9 @@ def main(argv=None) -> int:
         if buf is not None:
             buf[:, 0] = value
 
-    def rollout(posture: float | None = None):
+    def rollout(posture: float | None = None, record: bool = False):
         env.reset()
+        frames = []
         if posture is not None:
             set_posture(posture)
         zs, tilts, yaws, mouths = [], [], [], []
@@ -109,6 +117,13 @@ def main(argv=None) -> int:
             if posture is not None:
                 set_posture(posture)
 
+            if record and len(frames) < 200:
+                try:
+                    img = env.render()
+                    if img is not None:
+                        frames.append(img)
+                except Exception:
+                    pass
             zs.append(robot.data.root_link_pos_w[:, 2].detach().cpu().numpy())
             g = robot.data.projected_gravity_b.detach().cpu().numpy()
             tilts.append(np.degrees(np.arccos(np.clip(-g[:, 2], -1, 1))))
@@ -126,13 +141,25 @@ def main(argv=None) -> int:
                 ball_pos.append(b.data.root_link_pos_w.detach().cpu().numpy())
                 ball_vel.append(b.data.root_link_lin_vel_w.detach().cpu().numpy())
         return dict(zs=zs, tilts=tilts, yaws=yaws, mouths=mouths,
-                    ball_pos=ball_pos, ball_vel=ball_vel)
+                    ball_pos=ball_pos, ball_vel=ball_vel, frames=frames)
+
+    def save_video(r, suffix=""):
+        if not args.video or not r.get("frames"):
+            return
+        import imageio.v2 as imageio
+
+        path = args.video if not suffix else str(Path(args.video).with_name(
+            Path(args.video).stem + suffix + ".mp4"))
+        imageio.mimsave(path, r["frames"], fps=50)
+        result.setdefault("videos", []).append(path)
+        print(f"video: {path} ({len(r['frames'])} frames)")
 
     result = {"skill": args.skill, "task": args.task, "onnx": args.onnx}
     try:
         if args.skill == "sitstand":
             for label, cmd in (("stand", 0.0), ("sit", 1.0)):
-                r = rollout(posture=cmd)
+                r = rollout(posture=cmd, record=args.video is not None)
+                save_video(r, f"_{label}")
                 z_end = r["zs"][-1]
                 tilt_end = r["tilts"][-1]
                 result[f"{label}_z_end_mean"] = round(float(z_end.mean()), 4)
@@ -141,7 +168,8 @@ def main(argv=None) -> int:
                     float(((z_end > 0.10) if cmd == 0.0 else (z_end < 0.075)).mean()), 3
                 )
         elif args.skill == "ballkick":
-            r = rollout()
+            r = rollout(record=args.video is not None)
+            save_video(r)
             p0, p1 = r["ball_pos"][0], r["ball_pos"][-1]
             disp = np.linalg.norm(p1 - p0, axis=1)
             speed = np.array([np.linalg.norm(v, axis=1) for v in r["ball_vel"]])
@@ -151,7 +179,8 @@ def main(argv=None) -> int:
             result["robot_fell_ratio"] = round(
                 float((np.array(r["tilts"]) > 60).any(axis=0).mean()), 3)
         elif args.skill == "groundpick":
-            r = rollout()
+            r = rollout(record=args.video is not None)
+            save_video(r)
             mouths = np.array(r["mouths"])
             result["mouth_min_height_mean_m"] = round(float(mouths.min(axis=0).mean()), 4)
             result["mouth_min_height_best_m"] = round(float(mouths.min()), 4)
@@ -160,7 +189,8 @@ def main(argv=None) -> int:
             result["returned_upright_ratio"] = round(
                 float(((r["zs"][-1] > 0.10) & (r["tilts"][-1] < UPRIGHT_TILT_DEG)).mean()), 3)
         else:  # spin
-            r = rollout()
+            r = rollout(record=args.video is not None)
+            save_video(r)
             yaw = np.degrees(np.unwrap(np.radians(np.array(r["yaws"])), axis=0))
             total = np.abs(yaw[-1] - yaw[0])
             result["yaw_turned_mean_deg"] = round(float(total.mean()), 1)

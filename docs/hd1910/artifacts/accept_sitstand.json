@@ -1,0 +1,11 @@
+{
+  "skill": "sitstand",
+  "task": "Mjlab-SitStand-Flat-MicroDuck-HD1910",
+  "onnx": "policies/hd1910_sitstand.onnx",
+  "stand_z_end_mean": 0.1181,
+  "stand_tilt_end_deg": 6.0,
+  "stand_ok_ratio": 1.0,
+  "sit_z_end_mean": 0.0748,
+  "sit_tilt_end_deg": 7.1,
+  "sit_ok_ratio": 0.75
+}
