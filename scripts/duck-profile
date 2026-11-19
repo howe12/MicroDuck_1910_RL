@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# duck-profile — snapshot / switch the robot's policy configuration.
+#
+# What is versioned: /etc/robot/feetech-ft5/robotd.toml (which model runs in which
+# slot, pad bindings, skills) and /opt/robot/feetech-ft5-r5/management-profile.json
+# (the model list the console enumerates). Model files themselves are never moved
+# or deleted — every package stays under models/<sha256[:32]>/.
+set -euo pipefail
+
+CFG=/etc/robot/feetech-ft5/robotd.toml
+PROF=/opt/robot/feetech-ft5-r5/management-profile.json
+STORE=/opt/robot/profiles
+VENDOR_WALK=1cbf8730eadd75a5704332c9f3c10f60
+VENDOR_SITSTAND=1c94934c6421ec72ed48079cea749668
+VENDOR_PICK=b14e3a8b56ddbb8d2d831e727774a168
+VENDOR_KICKL=ee0376c927044cdece056ba1d3e6eac7
+VENDOR_KICKR=67ad09d82f4865d222a7ae06f250cf9f
+VENDOR_ROUL=59e15d7b04d0c40e9b11b8a70bdecae6
+MODELS=/opt/robot/feetech-ft5-r5/models
+
+need_root() { [ "$(id -u)" -eq 0 ] || { echo "需要 sudo" >&2; exit 1; }; }
+
+toml_ok() { python3 -c 'import tomllib,sys; tomllib.load(open(sys.argv[1],"rb"))' "$1"; }
+
+case "${1:-}" in
+  list)
+    mkdir -p "$STORE"
+    for d in "$STORE"/*/; do
+      [ -d "$d" ] || continue
+      n=$(basename "$d")
+      note=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("note",""))' "$d/meta.json" 2>/dev/null || true)
+      ts=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("saved_at",""))' "$d/meta.json" 2>/dev/null || true)
+      printf '%-14s %s  %s\n' "$n" "$ts" "$note"
+    done
+    ;;
+  save)
+    need_root; n=${2:?用法: duck-profile save <名字>}; note=${3:-}
+    mkdir -p "$STORE/$n"
+    cp "$CFG" "$STORE/$n/robotd.toml"
+    cp "$PROF" "$STORE/$n/management-profile.json"
+    python3 - "$STORE/$n/meta.json" "$note" "$n" <<'PY'
+import json, sys, time
+json.dump({"saved_at": time.strftime("%Y-%m-%d %H:%M:%S"), "note": sys.argv[2], "name": sys.argv[3]},
+          open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
+PY
+    echo "已保存: $STORE/$n"
+    ;;
+  diff)
+    n=${2:?用法: duck-profile diff <名字>}
+    diff -u "$STORE/$n/robotd.toml" "$CFG" | grep -E '^[+-]"[a-z_]+" = |^[+-]"' | head -30 || true
+    ;;
+  use)
+    need_root; n=${2:?用法: duck-profile use <名字> [--no-restart]}; shift 2 || true
+    [ -d "$STORE/$n" ] || { echo "没有这个版本: $n" >&2; exit 1; }
+    toml_ok "$STORE/$n/robotd.toml"
+    python3 -c 'import json,sys;json.load(open(sys.argv[1]))' "$STORE/$n/management-profile.json"
+    cp "$CFG" "$CFG.bak-switch-$(date +%Y%m%d-%H%M%S)"
+    cp "$STORE/$n/robotd.toml" "$CFG"
+    cp "$STORE/$n/management-profile.json" "$PROF"
+    echo "已切到: $n"
+    if [ "${1:-}" != "--no-restart" ]; then
+      systemctl restart robotd
+      sleep 6
+      systemctl is-active robotd
+      python3 - "$CFG" <<'PY'
+import tomllib, sys
+d = tomllib.load(open(sys.argv[1], "rb"))
+for k in ("walk", "sitstand", "ground_pick", "kick_left", "kick_right", "roulade", "stand"):
+    v = d.get("policy", {}).get(k)
+    print(f"  {k:12s} {v}")
+PY
+    fi
+    ;;
+  status)
+    python3 - "$CFG" <<'PY'
+import socket, json, tomllib, sys
+cfg = tomllib.load(open(sys.argv[1], "rb"))
+def rpc(m):
+    with socket.socket(socket.AF_UNIX) as s:
+        s.settimeout(6); s.connect("/run/robotd.sock")
+        s.sendall((json.dumps({"jsonrpc":"2.0","id":1,"method":m,"params":{}})+"\n").encode())
+        with s.makefile("rb") as f: return json.loads(f.readline(1048576))
+try:
+    loaded = rpc("robot.busStatus")["result"].get("loaded_models") or {}
+except Exception as exc:
+    loaded = {}; print("robotd 不可达:", exc)
+for slot in ("walk", "sitstand", "ground_pick", "kick_left", "kick_right", "roulade", "stand"):
+    want = cfg.get("policy", {}).get(slot)
+    got = loaded.get(slot)
+    sha = (got or {}).get("sha256", "")[:10] if isinstance(got, dict) else ""
+    mark = "OK " if isinstance(got, dict) else ("-- " if want in (None, "none") else "!! ")
+    print(f"  {mark}{slot:12s} 已加载={sha or '无':10s} 配置={str(want).split('/')[-2] if want and want != 'none' else want}")
+PY
+    ;;
+  *)
+    cat <<EOF
+用法:
+  duck-profile list                     看已保存的版本
+  duck-profile save <名字> [说明]        把当前配置存为一个版本
+  duck-profile diff <名字>              当前配置与该版本的差异
+  duck-profile use <名字>               切到该版本（自动重启并回读）
+  duck-profile use <名字> --no-restart  只改文件不重启
+  duck-profile status                   每个槽位：配置指向 vs 实际加载
+
+文件:
+  配置   $CFG
+  列表   $PROF
+  版本   $STORE/<名字>/
+EOF
+    ;;
+esac

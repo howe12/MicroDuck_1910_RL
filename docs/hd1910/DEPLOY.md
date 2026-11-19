@@ -202,3 +202,32 @@ sed -i "s|/opt/robot/policies/local/<slot>/policy.onnx|<BASE>/models/<id>/policy
 改完先 `tomllib.loads` 验证可解析，再 restart。
 
 结果：`mp.catalog()` 六个槽位全部有名字，`loaded_models` 八个槽位有值，日志合同错误 0。
+
+## 版本切换：`duck-profile`
+
+实机上装了 `/usr/local/bin/duck-profile`，源码在 `scripts/duck-profile`。
+
+版本化的是**两个文件**，不动模型本体（每个包永远留在 `models/<sha256[:32]>/`）：
+
+| 文件 | 作用 |
+|---|---|
+| `/etc/robot/feetech-ft5/robotd.toml` | 哪个模型跑哪个槽位、`[pad]` 绑定、`[[policy.skill]]` |
+| `/opt/robot/feetech-ft5-r5/management-profile.json` | 中控列表里枚举哪些模型 |
+
+```bash
+sudo duck-profile list                  # 已保存的版本
+sudo duck-profile status                # 每个槽位：配置指向 vs 实际加载的 sha
+sudo duck-profile save <名字> "说明"    # 把当前配置存成一个版本
+sudo duck-profile diff <名字>           # 当前与某版本的差异
+sudo duck-profile use <名字>            # 切过去（先备份、先校验 TOML/JSON、再重启回读）
+sudo duck-profile use <名字> --no-restart   # 只改文件，不重启
+```
+
+已存两个：`factory`（随包原厂）、`selftrained`（我们的五个模型）。
+
+`use` 的失败保护：切换前自动 `cp` 一份带时间戳的 `.bak-switch-*`；目标文件先过
+`tomllib` / `json` 解析才落盘，解析不过直接退出、不动现有配置。
+（这条规则来自一次真实的翻车：用按行重建 TOML 的办法改 `[[policy.skill]]`，
+`replace('', new)` 把新路径插进了每个字符间隙，robotd 直接起不来。）
+
+**注意**：`use` 会 `systemctl restart robotd`，机器人会瞬间卸力。切换时请扶稳或架空。
