@@ -83,3 +83,58 @@ sudo robotctl policy reset            # 全部
 2. 零位是"物理零位"，仿真 HOME 是标称姿态，两者差异未量化。
 3. 质量表 0/21 实称，惯量按质量比缩放 —— 策略是在这个近似模型上训的。
 4. `kick_left` 仍是原厂策略，左右脚不一致。
+
+## 更新（2026-11-19）：固件要求的是"模型目录"，不是单个 onnx
+
+上一版部署只把裸 `.onnx` 放进 `/opt/robot/policies/local/`，固件启动第 3/4 步报：
+
+```
+/opt/robot/policies/local/deployment-contract.json: No such file or directory
+```
+
+固件读的是 **onnx 所在目录**的配套文件，缺 `deployment-contract.json` 直接失败。
+
+### 契约（来自 `model_packages.validate_export`，逐条实测）
+
+| 项 | 要求 |
+|---|---|
+| `schema` | `microduck-deployment-contract/v1` |
+| `task_adapter` | `hd1910-official0151`（或 v1/v2/v8 限定场景）|
+| `task` | 必须在白名单里；**walk 槽位只认 `Mjlab-VelStand-Flat-MicroDuck`** |
+| 维度 | 61 / 14 |
+| `obs_normalizer` | `baked_in_onnx` |
+| 哈希 | `sha256(policy.onnx) == manifest.onnx_sha256`，且 `manifest.task == contract.task` |
+| ONNX 元数据 | 必须与 `contract.onnx_metadata` **完全相等**（8 个键逐字节）|
+| 关节顺序 | 固定 14 个：left 5 + 头 4 + right 5 |
+| 动作 | `use_default_offset=true`、`offset=0`、`clip=null`、`0<scale≤2` |
+| 观测布局 | 正好 8 项，`joint_pos`/`joint_vel` 用 `_rel`（齿隙版用 `_rel_backlash`），不得带 clip/scale/history |
+| BAM | `parameter_file.sha256` 必须等于 `ef2d51ad…`，`kp_fw` 为 1..32 整数 |
+| HOME | 14 个 `home_rad` 与 metadata `default_joint_pos` 逐项差 ≤ 0.000501 rad |
+| ONNX 算子 | 只允许 Sub/Div/Gemm/Elu/Tanh/Relu/Add/Mul/Clip/Identity/Constant/MatMul/LeakyRelu/Sigmoid/Softplus |
+
+### 解决办法
+
+`scripts/pack_deployment.py`：拿随包模型目录当模板（actuator/BAM/joint 表/观测布局直接沿用），
+只重写属于我们自己训练的部分——task 名、ONNX 元数据、训练 HOME、哈希。
+
+```bash
+uv run --no-sync scripts/pack_deployment.py \
+    --onnx policies/hd1910_walk_all.onnx --template /tmp/tpl/m --out /tmp/pkg_walk
+```
+
+校验（板上）：
+
+```python
+import model_packages as mp; mp.verify_directory(Path("/tmp/pkg_walk"))
+→ OK id=9f4774d02832 slot=walk task=Mjlab-VelStand-Flat-MicroDuck
+```
+
+安装：目录必须**含 `policy.onnx`**，然后把 `[policy] walk` 指到 `<目录>/policy.onnx`。
+
+重启后 `robot.busStatus.loaded_models.walk` 出现 `task=Mjlab-VelStand-Flat-MicroDuck sha=9f4774d028`，
+即固件已接受该模型。
+
+### 仍未完成
+
+`sitstand` / `ground_pick` / `kick_right` / `roulade` 仍是裸 onnx，`loaded_models` 里为 `null`，
+需要各自生成模型目录（模板与 task 名不同，roulade/kick 还有额外的 manifest 字段要求）。
