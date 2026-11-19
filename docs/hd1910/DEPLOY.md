@@ -138,3 +138,34 @@ import model_packages as mp; mp.verify_directory(Path("/tmp/pkg_walk"))
 
 `sitstand` / `ground_pick` / `kick_right` / `roulade` 仍是裸 onnx，`loaded_models` 里为 `null`，
 需要各自生成模型目录（模板与 task 名不同，roulade/kick 还有额外的 manifest 字段要求）。
+
+### 全槽位补齐（2026-11-19 下午）
+
+`custom_only = true` 的要求是：**配置里出现的每个非空槽位都必须有导出合同**，否则启动时报
+
+```
+using the default policy where an override would not load
+  — sitstand: inference failed: self-trained-only mode requires an exported deployment contract
+```
+
+四个槽位（sitstand / ground_pick / kick_right / roulade）此时仍指向裸 onnx，已按"同槽位随包模型
+当模板"的方式补齐——只替换 `policy.onnx`、重写 `onnx_metadata`、两个哈希与 14 个 `home_rad`，
+其余字段（BAM 参数块、关节表、观测布局、动作滤波、技能窗口）原样保留，所以一次就通过了校验。
+
+| 槽位 | 目录 | 模板来源 | task（保留模板值） |
+|---|---|---|---|
+| walk | `local/walk/` | velstand | `Mjlab-VelStand-Flat-MicroDuck` |
+| sitstand | `local/sitstand/` | sitstand | `Mjlab-SitStand-Flat-MicroDuck` |
+| ground_pick | `local/ground_pick/` | ground_pick | `Mjlab-GroundPick-Flat-Backlash-MicroDuck` |
+| kick_right | `local/kick_right/` | kick_right | `Mjlab-BallKick-Flat-MicroDuck` |
+| roulade | `local/roulade/` | roulade | `Mjlab-Roulade-Flat-MicroDuck` |
+
+重启后 `loaded_models` 全部有值，日志里合同错误计数为 0。
+
+**易漏的一点**：`[[policy.skill]]` 里的单次技能还带一个显式 `path`，它独立于槽位。
+只改槽位不改 skill 的 path，按 RB 触发的还是原厂模型。已一并指向 `local/kick_right/policy.onnx`。
+
+**另一个易混点**：`robotctl pad bindings` 读的是 `/etc/robot/robotd.toml`（默认 `--pad-config`），
+而 robotd/padd 实际用的是 `/etc/robot/feetech-ft5/robotd.toml`。前者没有 `[pad]` 段，
+所以 `robotctl pad bindings` 会显示内置默认值（`sit_toggle`）和 "no such skill"，
+这不代表真实绑定有问题——以 feetech-ft5 那份为准。
