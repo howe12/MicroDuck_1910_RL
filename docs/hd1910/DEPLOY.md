@@ -169,3 +169,36 @@ using the default policy where an override would not load
 而 robotd/padd 实际用的是 `/etc/robot/feetech-ft5/robotd.toml`。前者没有 `[pad]` 段，
 所以 `robotctl pad bindings` 会显示内置默认值（`sit_toggle`）和 "no such skill"，
 这不代表真实绑定有问题——以 feetech-ft5 那份为准。
+
+### 让中控显示"已绑定"（2026-11-19 下午，模型搬家）
+
+中控的槽位列表由 `model_packages.catalog()` 生成，它只遍历
+`management-profile.json` 的 `builtin_models`，并且用字符串比较判断绑定：
+
+```python
+active = str(<BASE>/models/<id>/policy.onnx) == cfg['policy'][slot]
+```
+
+我们把模型放在 `policies/local/<slot>/`，robotd 能加载（`loaded_models` 有值），
+但这个比较永远不成立 → 界面显示"已存入，尚未绑定"。**是显示口径，不是加载失败。**
+
+修法两步：
+1. 把每个包搬进 `models/<sha256[:32]>/`，并往 `management-profile.json` 的
+   `builtin_models` 追加 `{id, name, slot}`；
+2. `[policy]` 对应行改成 `models/<id>/policy.onnx`。
+
+**踩到的坑**：先用"按行解析 TOML 再替换 path"的办法改 `[[policy.skill]]`，
+在单行内联表上 `tomllib.loads(line)` 取不到 `path`，返回 None，
+`str.replace('', new)` 把每个字符间隙都插入了新路径，整份配置被插坏、
+robotd 起不来（`systemctl is-active` 显示 activating）。
+
+教训：**改 TOML 用「整串替换」而不是「按行重建」**。这次最终用的是
+
+```bash
+sed -i "s|/opt/robot/policies/local/<slot>/policy.onnx|<BASE>/models/<id>/policy.onnx|g"
+```
+
+一处替换同时修好了 `[policy]` 和 `[[policy.skill]].path`（两者是同一串），
+改完先 `tomllib.loads` 验证可解析，再 restart。
+
+结果：`mp.catalog()` 六个槽位全部有名字，`loaded_models` 八个槽位有值，日志合同错误 0。
