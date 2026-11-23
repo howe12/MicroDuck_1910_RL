@@ -6,6 +6,7 @@
 
 ```text
 console/linux-v297/        Linux 中控完整运行目录
+tools/duck-monitor.sh      仓库根目录便捷入口（实际代码在 console/linux-v297/tools）
 ├── console.py             中控主程序
 ├── start.sh               Linux 启动脚本
 ├── install.sh             桌面图标安装
