@@ -1,0 +1,279 @@
+/* V262: task-focused pages using the existing console components. */
+body:not(.four-page-console) #motors{display:none}
+body.four-page-console{--green:#f2a354;--muted:#929a9b;--line:#343b3e;--panel:#192024;--warm:#edb36a}
+.four-page-console .brand svg rect{fill:var(--green)}
+.four-page-console .brand .brand-sub{display:flex;align-items:baseline;gap:8px;margin-top:0;font-size:10px;letter-spacing:.55px;color:#8da09a}
+.four-page-console .brand-author{font-size:12px;font-weight:650;letter-spacing:.2px;color:var(--green)}
+.four-page-console .brand-product{font-size:9px;letter-spacing:.6px}
+.four-page-console .sidebar .side-label{margin:32px 8px 12px;color:#c0cdca;font-size:12px;font-weight:600;letter-spacing:1px}
+.four-page-console .sidebar nav{gap:10px}
+.four-page-console .sidebar nav>.task-menu{position:relative;display:grid;grid-template-columns:26px minmax(0,1fr) 16px;align-items:center;gap:8px;padding:12px 10px;border:1px solid #4b595c;border-radius:8px;background:#1a2326;height:88px;min-height:88px;max-height:88px;width:100%;min-width:0;overflow:hidden;color:#e2e9e6;opacity:1}
+.task-number{flex-shrink:0;width:26px;height:32px;display:grid;place-items:center;border:1px solid #53615f;border-radius:7px;background:#273338;color:#edc49a;font:600 12px ui-monospace,monospace}
+.task-menu-copy{display:grid;gap:4px;min-width:0;width:100%;overflow:hidden}.task-menu-copy b{font-size:14px;font-weight:700;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.task-menu-copy small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;max-height:3em;overflow:hidden;font-size:11px;color:#adb9b6;line-height:1.5;white-space:normal;overflow-wrap:anywhere}.task-lock{width:16px;margin-left:0;text-align:center;font-size:18px;line-height:1;color:#b6c2bf}
+.four-page-console .sidebar nav>.task-menu:hover:not(:disabled):not(.active){background:#253035;border-color:#82908b}
+.four-page-console .sidebar nav>.task-menu:focus-visible{outline:2px solid #f2a354;outline-offset:3px}
+.four-page-console .sidebar nav>.task-menu.active{background:#3a2d22;border-color:#c08c56;color:#fff0df;box-shadow:inset 3px 0 0 #f2a354}.task-menu.active .task-number{color:#192024;background:#f2a354;border-color:#f2a354}.task-menu.active .task-lock{color:#f2a354}.task-menu.active .task-menu-copy small{color:#e2be98}
+.four-page-console .sidebar nav>.task-menu.active:hover:not(:disabled){background:#463527;border-color:#e6aa6f}
+.four-page-console .sidebar nav>.task-menu:disabled{color:#8b9798;cursor:not-allowed;background:#171e21;border-color:#303a3f}.task-menu:disabled .task-number{color:#8e9996;background:#222b2e;border-color:#3d4749}.task-menu:disabled .task-menu-copy small{color:#84918d}
+.four-page-console .sidebar nav>.task-menu.active:disabled{background:#352a21;border-color:#946f48;color:#ddc7ae;box-shadow:inset 3px 0 0 #ba8e60}.task-menu.active:disabled .task-number{background:#8c683f;border-color:#8c683f;color:#171e21}
+@media(min-width:801px) and (max-width:1220px){.four-page-console .sidebar nav>.task-menu{grid-template-columns:24px minmax(0,1fr) 10px;padding:12px 8px;gap:7px}.four-page-console .task-number{width:24px;height:29px}.four-page-console .task-menu-copy b{font-size:13px}.four-page-console .task-menu-copy small{font-size:10.5px}.four-page-console .task-lock{width:10px;font-size:16px}}
+@media(min-width:801px) and (max-width:880px){.four-page-console .sidebar{width:184px;padding:24px 13px}.four-page-console .workspace{margin-left:184px}.four-page-console .sidebar .brand>span,.four-page-console .sidebar .side-label{display:block}}
+@media(min-width:801px) and (max-height:700px){.four-page-console .sidebar nav{gap:8px}.four-page-console .sidebar nav>.task-menu{height:76px;min-height:76px;max-height:76px;padding-block:10px}.four-page-console .task-menu-copy{gap:3px}.four-page-console .task-menu-copy small{font-size:10.5px;line-height:1.3;max-height:2.6em}}
+.task-common{margin:0 0 20px;min-width:0}.task-state-line{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 14px}.task-state-line h1{font-size:24px;font-weight:650;letter-spacing:-.6px}.task-state-line .eyebrow{color:#a77e55;letter-spacing:2px;font-size:10px;margin-bottom:4px}.task-state-line p{color:var(--muted);font-size:12px;margin-top:6px}.task-common>.panel-note{border:1px solid var(--line);border-radius:7px;margin-bottom:12px;background:#1c2729;color:#c0ccc8}.task-common>.panel-note.error{background:#342722;border-color:#795443;color:#e7b19a}
+.task-page{min-width:0;margin-bottom:22px}.task-page[hidden]{display:none!important}.task-page>.panel{margin-bottom:18px}.task-extra{border:1px solid var(--line);border-radius:9px;background:#141c1f;margin:18px 0;overflow:hidden}.task-extra>summary{padding:13px 16px;cursor:pointer;color:#b7c0c0;font-size:12px}.task-extra[open]>summary{border-bottom:1px solid var(--line);margin-bottom:15px}.task-extra #diagnostics{padding:0 15px 15px;margin:0}.task-extra #service-firmware{margin:0}.task-extra .firmware-card .panel-head h2{font-size:14px}.task-extra .task-sensor-grid{padding:0 15px 15px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.task-empty{padding:55px 20px;text-align:center;margin-bottom:22px;min-height:270px;display:grid;align-content:center;justify-items:center;gap:13px;background:radial-gradient(ellipse at 50% 35%,#75543318,transparent 60%),var(--panel)}.task-empty-mark{font-size:38px;color:#c89361}.task-empty h2{font-size:19px}.task-empty p{font-size:13px;color:var(--muted);max-width:520px}
+.numbering-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:18px;align-items:start}.task-card-body{padding:18px;display:grid;gap:16px;min-width:0}.task-card-body p,.task-card-body li{font-size:12px;color:#9ca9a9;line-height:1.8}.task-card-body ol{padding-left:20px;margin:0;display:grid;gap:9px}.task-check{display:flex;align-items:center;gap:5px;font-size:12px;color:#d0c7ba;line-height:1.7}.task-check input{flex-shrink:0}.task-button-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.numbering-fields{display:grid;grid-template-columns:.8fr 1.2fr;gap:18px;padding:16px;background:#121a1d;border:1px solid #343e40;border-radius:8px}.numbering-fields .field{margin:0;color:#9baaa9;gap:10px}.numbering-fields select{width:100%;min-width:0}.task-readback{display:grid;gap:8px}.task-readback span{font-size:12px;color:#9ca9a9}.task-readback strong{font:34px/1.2 ui-monospace,monospace;color:#f3b77d}.task-result{min-height:43px;padding-top:12px;border-top:1px solid #303a3d;white-space:pre-wrap;overflow-wrap:anywhere;color:#a4b4b0!important}.wiring-photo-open{display:block;width:100%;max-width:100%;padding:0;background:#fff;text-align:center;cursor:zoom-in}.wiring-photo-open>img{display:block;width:auto;max-width:100%;height:auto;max-height:none;margin:0 auto;object-fit:contain}.wiring-photo-hint{display:block;padding:9px 14px;border-top:1px solid #e0e3e3;background:#f6f7f7;color:#586568;font-size:12px}.task-photo-card .task-card-body{gap:10px}
+/* One tall model at left; the workbench and measured joints share the right column. */
+.calibration-page-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:18px;align-items:stretch;min-width:0}
+.calibration-page-grid>.twin-panel{grid-column:1;grid-row:1;display:flex;flex-direction:column;align-self:stretch;min-height:960px;height:auto!important;max-height:none}
+.calibration-workbench-stack{grid-column:2;grid-row:1;display:flex;flex-direction:column;gap:18px;min-width:0}
+.calibration-workbench-stack>#calibration-shared{min-width:0}
+.calibration-workbench-stack .service-editor{grid-column:auto;grid-row:auto;height:auto!important;min-height:0}
+.calibration-page-grid .twin-stage{flex:1 1 0;min-height:760px;height:auto!important}
+.calibration-page-grid .pose-hud{bottom:60px;right:12px;flex-wrap:wrap}
+.calibration-workbench-stack .service-editor .service-editor-body{overflow:visible;max-height:none}
+.calibration-workbench-stack .service-editor .service-workbench-bottom{flex-wrap:wrap}
+.calibration-readback{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin:18px 0}
+.calibration-readback .service-observation{min-width:0}.calibration-readback .service-inspection{margin:0}
+.task-page .motors-panel{margin:18px 0}.calibration-workbench-stack .motors-panel{margin:0;min-width:0}
+.task-page-calibration .calibration-workbench-stack #motors .table-scroll,
+.task-page-robot #motors .table-scroll{height:auto;max-height:none;overflow-x:auto;overflow-y:visible}
+/* Motion: controls above, AI beside feedback and its curve, sensors below. */
+.task-page-robot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"controls controls" "ai joints" "sensors sensors";gap:18px;align-items:start}
+.task-page-robot .robot-operation-grid{grid-area:controls;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:stretch;min-width:0;margin-bottom:0}
+.task-page-robot .robot-operation-grid>.panel{height:auto!important;min-height:650px;max-height:none;overflow:visible;display:flex;flex-direction:column;min-width:0}
+.task-page-robot .robot-operation-grid .twin-stage{height:auto!important;min-height:390px;flex:1}
+.task-page-robot #control-panel .webpad-content{overflow:visible}.task-page-robot #ai-agent-panel{grid-area:ai;margin:0}.task-page-robot .twin-panel .pose-reference-toolbar{display:none}.task-page-robot .pad-help{max-height:280px;overflow:auto}
+.task-page-robot .robot-joint-stack{grid-area:joints;display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-content:start;min-width:0;min-height:0}
+.task-page-robot #robot-shared{min-width:0;min-height:0}
+.task-page-robot #robot-shared>.motors-panel{height:auto;min-width:0;margin:0}
+.task-page-robot #robot-joint-curve{display:flex;margin:0}
+.task-page-robot #robot-joint-curve>.service-joint-chart{display:flex;flex-direction:column;min-width:0}
+.task-page-robot #robot-joint-curve .joint-chart{flex:none;height:220px!important;min-height:220px;max-height:220px}
+.task-page-robot #robot-observation{grid-area:sensors;margin:0}
+/* On two-column layouts the joint stack sets the row height; AI fills it. */
+@media(min-width:1101px){
+  .task-page-robot #ai-agent-panel{contain:size;align-self:stretch;min-height:0}
+  .task-page-robot #ai-agent-panel>.panel-head{flex:none;min-height:56px}
+  .task-page-robot #ai-agent-panel .ai-layout{overflow-y:auto;overflow-x:hidden}
+  .task-page-robot #ai-agent-panel .ai-chat-window{flex:1 1 0;height:auto;min-height:140px;max-height:none}
+  .task-page-robot #ai-agent-panel .ai-chat-empty{height:100%;min-height:0}
+}
+.task-observation-heading{padding:14px 16px;border-bottom:1px solid var(--line);margin-bottom:15px}
+.task-observation-heading h2{font-size:14px;color:#bdc7c6}
+/* Shared row height follows whichever card has the most content at this width. */
+.robot-observation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:18px;padding:0 15px 15px;min-width:0}
+.robot-observation-grid>.panel{min-width:0;display:flex;flex-direction:column}
+.robot-observation-grid>.panel>.panel-head{flex:none}
+.robot-observation-grid>#camera-panel{height:auto;min-height:0}
+.robot-observation-grid .camera-stage{position:relative;aspect-ratio:16/9;height:auto!important;min-height:160px;flex:1 1 auto}
+.robot-observation-grid .camera-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.robot-observation-grid .camera-stats,.robot-observation-grid .depth-scale,.robot-observation-grid .panel-note{flex:none}
+.robot-observation-grid .tof-layout{flex:1 1 auto;align-items:center;min-width:0}
+.robot-observation-grid .tof-grid{align-self:center;min-width:0}
+.robot-observation-grid .odom-chart,.robot-observation-grid .odom-values{flex:none}
+.robot-observation-grid .system-lines{flex:1 1 auto;align-content:space-between}
+.robot-joint-curve-host{margin:18px 0;min-width:0}
+.robot-joint-curve-host>.service-joint-chart{width:100%;height:auto!important;min-height:0;margin:0}
+.hardware-session{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 20px;margin-bottom:18px}.hardware-session p{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.7}.hardware-session h2{font-size:17px}.hardware-session .eyebrow{font-size:10px;color:#b28a60}.board-test-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:stretch}.board-test-grid>.board-test-part{min-width:0}.board-test-grid>#board-hub-panel{grid-column:auto;display:flex;flex-direction:column;min-height:0}.board-test-grid>#board-imu-panel .imu-body{flex-wrap:wrap;justify-content:center;gap:16px;padding-inline:16px}.board-test-grid>#board-imu-panel .attitude-dial{width:clamp(140px,11vw,170px);max-width:100%}.board-test-grid>#board-imu-panel .imu-values{min-width:120px;flex:1 1 120px;gap:12px}.board-test-grid>.board-test-part .raw-vectors>div{flex-wrap:wrap;min-width:0}.board-test-grid>.board-test-part .raw-vectors code{white-space:normal;overflow-wrap:anywhere;min-width:0}.board-test-grid>.board-test-part .task-button-row{flex-wrap:wrap}.board-test-grid>.board-test-part .panel-head>div{flex-wrap:wrap}.board-test-part{min-height:330px}.board-test-part .panel-head{min-height:58px}.board-test-part .attitude-dial{width:clamp(155px,15vw,210px)}.board-test-part .imu-body{padding:5px 20px 15px;gap:25px}.board-test-part .imu-values{gap:20px}.board-test-part .imu-values strong{font-size:20px;color:#d3ebbd}.board-test-part .sensor-chart{height:100px}.board-test-part .raw-vectors{padding:14px 20px}.board-test-part .raw-vectors code{font-size:12px}.board-test-part .imu-test-toolbar{padding:15px 20px 8px;gap:10px}.task-mini-status{display:flex;gap:8px 20px;flex-wrap:wrap;color:#8d9e9e;font:11px ui-monospace,monospace}.board-test-part .task-card-body{gap:18px}.mic-level-display{display:grid;justify-items:center;align-content:center;gap:24px;min-height:160px;background:transparent;border:1px solid var(--line);border-radius:9px;padding:24px 16px}.mic-level-display strong{font:20px ui-monospace,monospace;color:#d3ebbd;font-variant-numeric:tabular-nums}.mic-level-meter{display:flex;align-items:center;gap:5px;width:100%;max-width:410px;height:65px}.mic-level-meter i{flex:1;height:70%;border-radius:3px;background:#343d3e;transition:background-color .08s}.mic-level-meter i:nth-child(3n){height:90%}.mic-level-meter i.on{background:var(--green)}.mic-level-meter i.on:nth-last-child(-n+4){background:var(--red)}.duck-sound-symbol{height:140px;display:grid;place-items:center;color:var(--green);font:80px/1 Georgia,serif;background:transparent}.hub-check-list{display:grid;gap:9px;font-size:12px;color:#bbd0b2;border-left:2px solid var(--line);padding-left:12px}
+#task-tutorial-dialog{width:min(1180px,94vw);max-width:94vw;height:94dvh;max-height:94dvh;overflow:hidden;padding:0;background:#192024;border-color:#6d5038;color:#e0e2de}#task-tutorial-dialog[open]{display:flex;flex-direction:column}#task-tutorial-dialog::backdrop{background:#050a0dcc;backdrop-filter:blur(6px)}.tutorial-heading{position:relative;flex:none;padding:22px 24px 16px;border-bottom:1px solid var(--line)}.tutorial-heading>.eyebrow{color:#c89768;font-size:10px}.tutorial-heading h2{font-size:21px;margin:8px 32px 14px 0}.tutorial-view-tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.tutorial-view-tools [aria-pressed=true]{color:#ffd8af;border-color:#7a5736;background:#3d2f23}.tutorial-view-tools .text-button{margin-left:auto}.tutorial-content{flex:1 1 auto;min-height:0;overflow:auto;padding:20px 24px;overscroll-behavior:contain}.tutorial-photo{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}.tutorial-image-link{display:block;background:#fff;cursor:zoom-in}.tutorial-photo img{display:block;width:100%;height:auto;max-height:none;object-fit:contain}.tutorial-content.is-fit .tutorial-image-link{display:flex;justify-content:center}.tutorial-content.is-fit .tutorial-photo img{width:auto;max-width:100%;max-height:calc(94dvh - 250px);height:auto}.tutorial-photo p{font-size:11px;padding:10px 13px;margin:0!important;color:#a4b1b0!important;border-top:1px solid var(--line);background:#192024}#task-tutorial-steps{margin:18px 0 0;padding-left:24px;display:grid;gap:10px;font-size:12px;line-height:1.8;color:#b5c1bc}.tutorial-footer{flex:none;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 24px;border-top:1px solid var(--line);background:#192024}.tutorial-footer .task-check{color:#b8c3bf}
+/* Real photographed layout. Existing button and stick handlers remain attached. */
+#control-panel .photo-gamepad .pad-brand{margin:10px 0 8px;color:#b6a18e}#control-panel .photo-gamepad .pad-brand>span{color:#d6c9bc;font-size:11px}#control-panel .photo-gamepad .pad-brand>i{background:#f2a354;box-shadow:none}#control-panel .photo-gamepad .real-pad-triggers{display:grid;grid-template-columns:1fr 1fr;gap:18%;max-width:none;margin:0;padding:0 12%}#control-panel .photo-gamepad .real-pad-triggers button{min-height:28px;border:1px solid #6d5947;background:#2b2724;color:#dbb38d;border-radius:11px 11px 5px 5px;padding:3px 6px;font-size:10px}#control-panel .real-pad-surface{position:relative;width:100%;aspect-ratio:3/2;isolation:isolate;margin:1px 0 5px}#control-panel .real-pad-surface>img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 8px 7px #0006)}#control-panel .real-pad-surface .real-pad-hotspot{position:absolute!important;left:var(--pad-x)!important;top:var(--pad-y)!important;width:var(--pad-w)!important;height:var(--pad-h)!important;min-width:0!important;min-height:0!important;max-width:none!important;transform:translate(-50%,-50%)!important;padding:0!important;margin:0!important;border:2px solid transparent!important;border-radius:50%!important;background:transparent!important;box-shadow:none!important;color:transparent!important;font-size:0!important;z-index:2;opacity:1!important}#control-panel .real-pad-surface button.real-pad-hotspot:disabled{filter:none!important;cursor:default}#control-panel .real-pad-surface .real-pad-hotspot:hover:not(:disabled),#control-panel .real-pad-surface .real-pad-hotspot:focus-visible{border-color:#e7a25a!important;outline:0;box-shadow:0 0 0 3px #edaa5b33!important;background:#f2a35418!important}#control-panel .real-pad-surface .real-pad-hotspot.held{border-color:#f2a354!important;background:#f2a35455!important;box-shadow:0 0 12px #f2a35466!important}#control-panel .real-pad-surface .real-pad-hotspot small,#control-panel .real-pad-surface .real-pad-hotspot span{display:none}#control-panel .real-pad-surface .real-pad-stick{border-radius:50%!important;cursor:grab}#control-panel .real-pad-surface .real-pad-stick i{left:28%;top:28%;width:44%;height:44%;border:1px solid #f2b778;background:#f2a35466;opacity:0;pointer-events:none}#control-panel .real-pad-surface .real-pad-stick:active i{opacity:1}#control-panel .real-pad-surface .real-pad-small,#control-panel .real-pad-surface .real-pad-shoulder,#control-panel .real-pad-surface .real-pad-reference{border-radius:8px!important}#control-panel .real-pad-extra .pad-stick-clicks{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}#control-panel .real-pad-extra .pad-stick-clicks button{font-size:10px;min-height:25px;padding:3px 8px;color:#a9b4b2;border-color:#3d4848;background:#1d2729}.photo-gamepad .pad-center,.photo-gamepad .pad-abxy,.photo-gamepad .pad-dpad{display:none}
+@media(min-width:1700px){.task-page-robot .robot-operation-grid>.panel{min-height:730px}.task-page-robot .pad-help{max-height:320px}}
+@media(max-width:1050px){.numbering-grid,.board-test-grid{grid-template-columns:1fr}.task-state-line{align-items:flex-start;flex-wrap:wrap}.hardware-session{align-items:flex-start;flex-wrap:wrap}.task-extra .task-sensor-grid{grid-template-columns:1fr}.board-test-part .attitude-dial{width:180px}}
+@media(max-width:800px){.four-page-console .sidebar{padding:12px;position:relative;width:100%;height:auto;gap:0}.four-page-console .sidebar .brand{font-size:17px}.four-page-console .sidebar .brand svg{width:29px}.four-page-console .sidebar .brand-sub{font-size:9px}.four-page-console .side-label,.four-page-console .side-card,.four-page-console .side-bottom{display:none}.four-page-console .sidebar nav{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:12px;overflow:visible}.four-page-console .sidebar nav>.task-menu{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:24px minmax(0,1fr);justify-items:start;align-content:start;align-items:start;padding:9px 8px;gap:5px;height:112px;min-height:112px;max-height:112px;border:1px solid #4b595c}.task-menu-copy{gap:3px}.task-menu-copy b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;max-height:2.6em;font-size:12px;line-height:1.3;white-space:normal}.task-menu-copy small{font-size:10px;line-height:1.3;max-height:2.6em}.task-number{width:22px;height:24px;font-size:10px}.task-lock{position:absolute;right:9px;top:9px;font-size:14px}.four-page-console .workspace{margin-left:0!important}.four-page-console main{padding:18px 12px 0}.four-page-console .topbar{padding-inline:12px}.task-state-line h1{font-size:22px}.hardware-session{padding:16px}.hardware-session h2{font-size:16px}.numbering-fields{grid-template-columns:1fr}.task-card-body{padding:16px}.tutorial-footer{align-items:flex-start;flex-wrap:wrap}.tutorial-footer .button{width:100%}#task-tutorial-dialog{padding:0;max-width:94vw;max-height:94dvh}.tutorial-heading{padding:16px 16px 12px}.tutorial-heading h2{font-size:18px}.tutorial-content{padding:14px 16px}.tutorial-footer{padding:12px 16px}.tutorial-view-tools .text-button{margin-left:0}.tutorial-content.is-fit .tutorial-photo img{max-height:calc(94dvh - 290px)}.board-test-part .imu-body{gap:15px;padding-inline:15px}.board-test-part .attitude-dial{width:145px}.board-test-part .imu-values strong{font-size:15px}.board-test-part .imu-values{gap:15px}.board-test-part .raw-vectors>div{align-items:flex-start;flex-wrap:wrap}.board-test-part .raw-vectors code{font-size:11px;overflow-wrap:anywhere}.board-test-part .vector-line{gap:8px;flex-wrap:wrap}.shared-maintenance #diagnostics{padding-inline:8px}.four-page-console .top-actions .github-source-link{font-size:10px;padding:5px 8px}}
+@media(prefers-reduced-motion:reduce){.mic-level-meter i{transition:none}}
+.numbering-chain{border-top:1px solid var(--line);padding-top:18px;display:grid;gap:12px}.numbering-chain h3{font-size:13px;color:#d0c5b8}.numbering-chain p{font-size:12px!important}.task-next-step{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 20px}.task-next-step h2{font-size:14px}.task-next-step p{font-size:12px;color:var(--muted);margin-top:7px}@media(max-width:800px){.task-next-step{align-items:flex-start;flex-wrap:wrap}.task-next-step .button{width:100%}}
+#control-panel .real-pad-surface .real-pad-stickpress{pointer-events:none;z-index:3}
+
+@media(max-width:980px){
+  .calibration-page-grid{grid-template-columns:minmax(0,1fr)}
+  .calibration-page-grid>.twin-panel{grid-column:1;grid-row:1;min-height:760px}
+  .calibration-workbench-stack{grid-column:1;grid-row:2}
+  .calibration-page-grid .twin-stage{min-height:600px}
+}
+@media(max-width:600px){
+  .calibration-page-grid>.twin-panel{min-height:680px}
+  .calibration-page-grid .twin-stage{min-height:520px}
+}
+
+@media(max-width:1100px){
+  .task-page-robot{grid-template-columns:minmax(0,1fr);grid-template-areas:"controls" "ai" "joints" "sensors"}
+}
+@media(max-width:980px){
+  .task-page-robot .robot-operation-grid{grid-template-columns:minmax(0,1fr)}
+  .task-page-robot .robot-operation-grid>.panel{min-height:500px}
+  .task-page-robot .robot-operation-grid>#control-panel{min-height:0}
+  .task-page-robot .robot-operation-grid .twin-stage{min-height:350px}
+  .robot-observation-grid{grid-template-columns:minmax(0,1fr);align-items:start}
+  .robot-observation-grid .camera-stage,.robot-observation-grid .tof-layout,.robot-observation-grid .system-lines{flex:none}
+  .robot-observation-grid .system-lines{align-content:start}
+}
+
+/* Maintenance entry keeps the decision next to the selected task. */
+#task-entry-dialog{width:520px;max-width:calc(100% - 32px);padding:24px;background:var(--panel);border:1px solid #6d5038;border-radius:10px;color:#e0e2de}#task-entry-dialog::backdrop{background:#050a0dcc;backdrop-filter:blur(6px)}#task-entry-dialog .eyebrow{color:#c89768;font-size:10px}#task-entry-dialog h2{font-size:20px;margin:10px 0 16px}#task-entry-description{font-size:13px;line-height:1.8;color:#b5c1bc;margin:0 0 22px}#task-entry-dialog .task-button-row{justify-content:flex-end}.task-service-recovery{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:15px}.task-service-recovery p{margin:0}
+
+/* Scan progress and actual per-session numbering evidence. */
+.numbering-scan-area,.numbering-write-area,.numbering-mapping-area{display:grid;gap:12px;min-width:0}.numbering-scan-area,.numbering-mapping-area{border-top:1px solid var(--line);padding-top:16px}.numbering-workbench h3{font-size:13px}.numbering-scan-metrics{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 10px;font-size:11px;color:#b4bfba}#numbering-scan-progress{display:block;width:100%;height:11px;accent-color:var(--green)}.numbering-devices{display:grid;gap:7px;max-height:220px;overflow:auto;min-width:0}.numbering-device{padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:11px;overflow-wrap:anywhere}.numbering-device strong{color:#bbd0b2}.numbering-device small{display:block;color:var(--muted);margin-top:3px}.numbering-mapping{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.numbering-map-item{display:grid;gap:4px;min-width:0;padding:8px;border:1px solid var(--line);border-radius:6px}.numbering-map-item>div{display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap}.numbering-map-item strong{font:12px ui-monospace,monospace;color:#bbd0b2}.numbering-map-item .badge{font-size:10px;padding:1px 4px}.numbering-map-label{font-size:11px;overflow-wrap:anywhere}.numbering-map-item small{font-size:10px;color:var(--muted);overflow-wrap:anywhere}.numbering-fields{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}.numbering-fields .field{min-width:0}
+
+.numbering-center-area{display:grid;gap:12px;min-width:0;padding-top:16px;border-top:1px solid var(--line)}.numbering-center-readback{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:11px;color:var(--muted)}.numbering-center-readback strong{color:#d3ebbd;font-family:ui-monospace,monospace}#numbering-center-dialog{width:520px;max-width:94vw;padding:24px;background:var(--panel);border:1px solid #6d5038;border-radius:10px;color:#e0e2de}#numbering-center-dialog h2{font-size:19px;margin-bottom:14px}#numbering-center-dialog p{font-size:12px;line-height:1.8;margin-bottom:14px;color:#b5c1bc}#numbering-center-dialog .task-button-row{justify-content:flex-end}
+@media(max-width:800px){.numbering-fields{grid-template-columns:1fr}}
+
+/* Results are actual discovered devices; ID mapping does not imply full health. */
+.numbering-device-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0 5px;font-size:12px;text-align:left}.numbering-device-table .device-id-column{width:19%}.numbering-device-table .device-joint-column{width:28%}.numbering-device-table .device-numbering-column{width:24%}.numbering-device-table .device-communication-column{width:29%}.numbering-device-table th{padding:4px 5px;font-size:10px;font-weight:500;color:var(--muted);overflow-wrap:anywhere}.numbering-device-table td{vertical-align:top;padding:8px 5px;border-block:1px solid var(--line);overflow-wrap:anywhere}.numbering-device-table td:first-child{border-left:1px solid var(--line);border-radius:6px 0 0 6px;color:#cddac5;font-family:ui-monospace,monospace}.numbering-device-table td:last-child{border-right:1px solid var(--line);border-radius:0 6px 6px 0}.numbering-device-table .badge{font-size:10px;white-space:normal;overflow-wrap:anywhere;padding:1px 4px}.numbering-device-table small{display:block;margin-top:3px;font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+.numbering-device-table,.numbering-device-table th,.numbering-device-table td{white-space:normal;text-align:left}.numbering-device-table td{font-size:inherit}.numbering-device-table td:first-child{display:table-cell}
+
+/* Scan, number and wiring retain their reading order as columns wrap. */
+.numbering-scan-card h3{font-size:13px}.numbering-scan-card .numbering-scan-area{border-top:0;padding-top:0}.numbering-scan-card .numbering-devices{max-height:360px;min-width:0}.numbering-device-table input[type=radio]{width:13px;height:13px;margin:0 4px 0 0;vertical-align:middle;accent-color:var(--green)}.numbering-device-table td[data-conflict=true]{color:var(--red)}
+
+
+/* Each numbering row shares one bounded height; overflow stays in its card. */
+.numbering-grid{--numbering-card-height:1300px;align-items:stretch;grid-auto-rows:var(--numbering-card-height)}
+.numbering-grid>.panel{display:flex;flex-direction:column;height:100%;min-height:0;max-height:100%;overflow:hidden}
+.numbering-grid>.panel>.panel-head{flex:0 0 auto}
+.numbering-grid>.panel>.task-card-body{flex:1 1 auto;min-height:0;overflow:auto;align-content:start;scrollbar-gutter:stable}
+.numbering-grid .numbering-devices{max-height:none;overflow-x:auto;overflow-y:visible}
+.numbering-grid>.task-photo-card>.wiring-photo-open{flex:1 1 auto;min-height:0;overflow:auto;scrollbar-gutter:stable}
+.numbering-grid>.task-photo-card>.task-card-body{flex:0 1 auto;max-height:160px}
+.numbering-device[tabindex]{cursor:pointer}.numbering-device:focus-visible{outline:1px solid var(--green);outline-offset:2px}
+.numbering-grid .task-card-body p,.numbering-grid .task-card-body li{font-size:12px}
+.numbering-grid .tiny,.numbering-grid .task-check,.numbering-grid .task-readback span,.numbering-grid .task-result{font-size:12px}
+.numbering-grid .numbering-scan-metrics{font-size:12px}
+.numbering-grid .numbering-device-table{font-size:12px}
+.numbering-grid .numbering-device-table td{font-size:12px;line-height:20px}
+.numbering-grid .numbering-device-table th{font-size:11px;color:#7c977e}
+.numbering-grid .numbering-device-table .badge{font-size:11px}
+.numbering-grid .numbering-device-table small{font-size:11px}
+.numbering-grid .numbering-device-table{min-width:760px}
+.numbering-grid .numbering-device-table .device-id-column{width:10%}
+.numbering-grid .numbering-device-table .device-joint-column{width:16%}
+.numbering-grid .numbering-device-table .device-numbering-column{width:12%}
+.numbering-grid .numbering-device-table .device-communication-column{width:22%}
+.numbering-grid .numbering-device-table .device-position-column{width:12%}
+.numbering-grid .numbering-device-table .device-position{font-family:ui-monospace,monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+.numbering-grid .numbering-device-table .device-target-column{width:28%}
+.numbering-row-target{width:100%;min-width:170px;font-size:12px;padding:5px 7px}
+.numbering-actions-toolbar,.numbering-actions-footer{display:grid;gap:12px;min-width:0}
+.numbering-selection{display:flex;flex-wrap:wrap;gap:10px 24px;font-size:12px;color:var(--muted)}
+.numbering-selection strong{color:#d3ebbd;font:12px ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.numbering-shared-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.numbering-action-group{display:grid;justify-items:start;align-content:start;gap:8px;min-width:0}
+.numbering-action-group p{min-height:24px;overflow-wrap:anywhere}
+[data-action-state=error]{color:var(--red)!important}[data-action-state=running]{color:var(--muted)!important}
+@media(max-width:600px){.numbering-shared-actions{grid-template-columns:minmax(0,1fr)}}
+.wiring-photo-open{cursor:default}
+
+/* Keep the wiring photograph centered inside the existing equal-height card. */
+.numbering-grid>.task-photo-card>.wiring-photo-open{display:flex;align-items:center;justify-content:center;padding:18px;overflow:hidden;scrollbar-gutter:auto}
+.numbering-grid>.task-photo-card>.wiring-photo-open>img{width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;object-position:center}
+
+
+.task-photo-card>.wiring-photo-open{display:flex;align-items:center;justify-content:center}
+.numbering-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
+.numbering-toolbar>.task-button-row{gap:6px}
+.numbering-toolbar .numbering-selection{margin-left:auto;gap:6px 12px;align-items:center}
+.numbering-progress-line{display:flex;align-items:center;flex-wrap:wrap;gap:6px 18px;font-size:12px;color:var(--muted)}
+.numbering-operation-feedback{margin:0;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:transparent;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.6}
+.numbering-operation-feedback:empty{display:none}
+.numbering-workbench>.task-card-body{gap:10px}
+.board-test-controls{display:grid;gap:8px;padding:14px 18px 10px;align-content:start;min-width:0}
+.board-test-controls .task-button-row{gap:8px}
+.board-test-controls .button{min-height:32px;font-size:12px}
+.board-test-controls p{margin:0;padding:0;border:0;min-height:0;font-size:12px;line-height:1.6}
+.board-test-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.board-audio-stack{display:grid;grid-template-rows:repeat(2,auto);gap:18px;min-width:0}
+.board-audio-stack>.board-test-part{display:flex;flex-direction:column;min-width:0;min-height:0}
+.board-audio-stack>.board-test-part>.task-card-body{flex:1}
+/* The wiring picture shares the test row without imposing its intrinsic height. */
+.board-test-grid>#board-hub-panel>.panel-head,.board-test-grid>#board-hub-panel>.task-card-body{flex:0 0 auto}
+.board-test-grid>#board-hub-panel>.wiring-photo-open{position:relative;flex:1 1 0;min-height:0;overflow:hidden}
+.board-test-grid>#board-hub-panel>.wiring-photo-open>img{position:absolute;inset:0;width:100%;height:100%;max-width:100%;max-height:100%;padding:16px;object-fit:contain;object-position:center}
+@media(max-width:1050px){.board-test-grid{grid-template-columns:minmax(0,1fr)}.board-test-grid>#board-hub-panel>.wiring-photo-open{flex:none;min-height:clamp(280px,60vh,600px)}}
+
+/* Maintenance shares the other diagnostic cards' bounded height. */
+.shared-maintenance #diagnostics>#service-firmware{height:clamp(620px,72vh,900px);min-height:0}
+.shared-maintenance #diagnostics>#service-firmware .firmware-body{flex:1 1 0;min-height:0;overflow:hidden}
+
+/* Both lists use the existing measured-joint selection and tabular numbers. */
+.numbering-grid .numbering-device-table tr.selected>td{background:transparent}
+.numbering-grid .numbering-device-table .device-id-label{color:inherit;font-weight:600}
+
+/* Calibration keeps measured feedback and its curve together, below the compact editor. */
+.calibration-workbench-stack>#calibration-shared{display:grid;gap:18px;align-content:start}
+.calibration-workbench-stack>#calibration-shared>.service-joint-chart{height:auto!important;min-height:0;margin:0}
+.calibration-workbench-stack>#calibration-shared>.service-joint-chart .joint-chart{flex:none;height:180px!important;min-height:180px;max-height:180px}
+.calibration-readback #service-observation:empty{display:none}
+
+/* Matching title/content grids keep both frames aligned and fill the card remainder. */
+.shared-maintenance #diagnostics,.shared-maintenance #service-firmware .firmware-body{min-width:0}
+.shared-maintenance #diagnostics #service-firmware .maintenance-events{flex:1 1 0;height:auto;min-height:180px;max-height:none;overflow:hidden}
+.shared-maintenance #diagnostics #service-firmware .maintenance-streams{flex:1 1 0;min-height:0;min-width:0;overflow:hidden;align-items:stretch}
+.shared-maintenance #diagnostics #service-firmware .maintenance-streams>div{display:grid;grid-template-rows:auto minmax(0,1fr);min-width:0;min-height:0;overflow:hidden}
+.shared-maintenance #diagnostics #service-firmware .maintenance-streams h4{margin:0 0 7px;line-height:1.5}
+.shared-maintenance #diagnostics #service-firmware .maintenance-events .events,.shared-maintenance #diagnostics #service-firmware .maintenance-events #raw-json{box-sizing:border-box;width:100%;height:100%;min-height:0;max-height:none;margin:0;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:1100px){.shared-maintenance #diagnostics>#service-firmware{height:auto}.shared-maintenance #diagnostics>#service-firmware .firmware-body{flex:none;overflow:visible}.shared-maintenance #diagnostics #service-firmware .maintenance-events{flex:none;height:360px;min-height:0;max-height:360px}}
+@media(max-width:600px){.shared-maintenance #diagnostics #service-firmware .maintenance-streams{grid-template-rows:repeat(2,minmax(0,1fr))}}
+.numbering-grid .task-card-body p.numbering-wiring-guidance{margin:0;padding:10px 12px;border-left:3px solid var(--green);border-radius:6px;background:#3d2f2333;font-size:14px;line-height:1.7}
+.numbering-wiring-guidance strong{color:var(--green);font-weight:700}
+.numbering-wiring-guidance span{color:#d3ebbd;font-weight:600}
+
+/* Native startup diagnostics belong beside the workspace, below its title. */
+.four-page-console .task-common #connection-banner {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 8rem;
+  overflow-y: auto;
+}
+
+/* Live controls keep the photo coordinate system; guide labels never take input. */
+#control-panel .photo-gamepad{container:real-gamepad / inline-size;max-width:none}
+#control-panel .real-pad-guide{margin:14px 0 8px}
+#control-panel .real-pad-guide-top{display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:10%;margin:0 12% 24px}
+#control-panel .real-pad-callout{pointer-events:none;position:relative;min-width:0;padding:9px 11px;border:1px solid #b88049;border-radius:10px;background:#211e1bea;color:#ddd7cd;font-size:clamp(12px,1.6cqw,14px);line-height:1.6;overflow-wrap:anywhere}
+#control-panel .real-pad-callout h3{margin:0 0 4px;color:#f2b779;font-size:clamp(13px,1.9cqw,17px);font-weight:650;line-height:1.45}
+#control-panel .real-pad-callout p{margin:0;font-size:inherit;line-height:inherit}
+#control-panel .real-pad-callout small{display:block;font-size:.85em;color:#a9a399}
+#control-panel .real-pad-callout b{color:#f2a354}
+#control-panel .real-pad-canvas{position:relative}
+#control-panel .real-pad-canvas>.real-pad-surface{width:76%;margin:0 auto;aspect-ratio:3/2}
+#control-panel .real-pad-canvas>.real-pad-callout{position:absolute;width:24%;box-sizing:border-box;z-index:4}
+#control-panel .real-pad-guide-walk{left:0;top:18%}
+#control-panel .real-pad-canvas>.real-pad-guide-dpad{left:0;top:51%;width:25%}
+#control-panel .real-pad-canvas>.real-pad-guide-abxy{right:0;top:4%;width:22%}
+#control-panel .real-pad-guide-abxy p{display:flex;align-items:baseline;gap:7px;padding:4px 0}
+#control-panel .real-pad-guide-abxy p+p{border-top:1px solid #71503488}
+#control-panel .real-pad-guide-abxy b{font-size:1.45em;line-height:1}
+#control-panel .real-pad-canvas>.real-pad-guide-turn{right:0;top:69%;width:28%}
+#control-panel .real-pad-connectors{pointer-events:none;position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:3;fill:none;stroke:#f2a354;stroke-width:.25}
+#control-panel .real-pad-connectors circle{fill:#f2a354;stroke:#ffe0bd;stroke-width:.18}
+#control-panel .real-pad-surface .real-pad-hotspot:not(:disabled):not([aria-disabled=true]):not(.real-pad-stickpress)::after{content:'';position:absolute;inset:-3px;border:2px solid #ffc27f;border-radius:inherit;pointer-events:none;animation:real-pad-breathe 2.6s ease-in-out infinite;box-shadow:0 0 12px #f2a354a6,0 0 23px #f2a35459}
+#control-panel .real-pad-surface .real-pad-hotspot.held:not(:disabled):not([aria-disabled=true])::after,#control-panel .real-pad-surface .real-pad-hotspot:focus-visible::after{animation:none;opacity:1;box-shadow:0 0 0 4px #f2a35455,0 0 20px #f2a354dd,0 0 34px #f2a35488}
+#control-panel .real-pad-surface .real-pad-hotspot.held{box-shadow:0 0 20px #f2a354cc!important}
+#control-panel .real-pad-surface .real-pad-stick.held i{opacity:1}
+#control-panel .real-pad-surface .real-pad-stick[aria-disabled=true]{cursor:default}
+#control-panel .photo-gamepad .real-pad-triggers button:not(:disabled){box-shadow:0 0 10px #f2a35488}
+@keyframes real-pad-breathe{0%,100%{opacity:.32}50%{opacity:1}}
+@container real-gamepad (max-width:520px){
+  #control-panel .real-pad-guide-top{margin:0 0 12px;gap:10px}
+  #control-panel .real-pad-canvas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  #control-panel .real-pad-canvas>.real-pad-surface{width:100%;grid-column:1/-1}
+  #control-panel .real-pad-connectors{display:none}
+  #control-panel .real-pad-canvas>.real-pad-callout{position:static;width:auto}
+  #control-panel .real-pad-callout{font-size:12px;padding:8px 10px}
+  #control-panel .real-pad-callout h3{font-size:13px}
+  #control-panel .real-pad-guide-walk{order:1}#control-panel .real-pad-guide-turn{order:2}#control-panel .real-pad-guide-dpad{order:3}#control-panel .real-pad-guide-abxy{order:4}
+}
+@media(prefers-reduced-motion:reduce){#control-panel .real-pad-surface .real-pad-hotspot::after{animation:none!important;opacity:.8}}
+
+/* The original event feed stays visible inside System Maintenance. */
+#diagnostics #maintenance-events .maintenance-streams,
+#diagnostics #service-firmware #maintenance-events .maintenance-streams{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+#diagnostics #maintenance-events .maintenance-event-list,
+#diagnostics #service-firmware #maintenance-events .maintenance-event-list{grid-template-rows:minmax(0,1fr)}
+.maintenance-streams>.maintenance-raw[hidden]{display:none!important}
+
+/* Keep controller connection repair easy to find in the card header. */
+#control-panel #gamepad-repair-open.button{margin-left:auto;flex:none;min-height:38px;padding:8px 14px;font-size:13px;font-weight:650;color:#251b12;background:var(--green,#f2a354);border-color:var(--green,#f2a354);box-shadow:0 0 0 1px #f2a35433}
+#control-panel #gamepad-repair-open.button:hover:not(:disabled){background:#ffb66e;border-color:#ffb66e;filter:none}
+#control-panel #gamepad-repair-open.button:active:not(:disabled){background:#e79343;border-color:#e79343}
+#control-panel #gamepad-repair-open.button:focus-visible{outline:2px solid #ffd49f;outline-offset:3px}

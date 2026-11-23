@@ -1,0 +1,44 @@
+{
+  "old": "1fa843-feetech-ft6-control.118",
+  "new": "1fa843-feetech-ft6-control.102",
+  "before_sha256": "aa2608c722f8d86370b556a04d7abad45fcf88704b9a87a22557f1e64cb50ce2",
+  "after_sha256": "65bf917cd05f9304ae1d6602562f9aacc1953ae0b3d4fb067305a8f06678f7a0",
+  "bytes": 5861176,
+  "changed_byte_count": 2,
+  "changed_byte_offsets": [
+    621675,
+    621676
+  ],
+  "expected_literal_byte_offsets": [
+    621675,
+    621676
+  ],
+  "build_literal_offset": 621647,
+  "build_literal_length": 30,
+  "old_literal_occurrences": 1,
+  "new_literal_occurrences": 1,
+  "outside_build_literal_unchanged": true,
+  "same_length": true,
+  "changed_load_segments": [
+    {
+      "index": 2,
+      "flags": 4,
+      "executable": false,
+      "writable": false
+    }
+  ],
+  "executable_load_segments": [
+    {
+      "index": 3,
+      "sha256": "23674ad189be51176bdfc96e10dd4ce4b7f3c4eba40f1698bba2ba53886b67bd",
+      "unchanged": true
+    }
+  ],
+  "native_instructions_changed": false,
+  "native_identity_restored": true,
+  "native_payload_bytes_changed": true,
+  "exact_original_control102_resource_sha256": "65bf917cd05f9304ae1d6602562f9aacc1953ae0b3d4fb067305a8f06678f7a0",
+  "not_recompiled": true,
+  "baseline": "V281 / control.118",
+  "original_resource_reference": "V260 control.102 RESOURCE-MANIFEST"
+}

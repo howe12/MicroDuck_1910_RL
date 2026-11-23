@@ -1,0 +1,93 @@
+{
+  "source_repository": "kissqy/Microduck-kissqy",
+  "source_commit": "0ce34b01dcffff94fd04c3ebb1d5e57e28fb78d1",
+  "assets": {
+    "gamepad-real.png": {
+      "kind": "imagegen edit from user photograph",
+      "source": "用户原照 1000022623.jpg",
+      "details": "White GameSir controller; isolated and upright; actual front control layout retained; rear buttons excluded. Source photograph does not expose LT/RT trigger surfaces.",
+      "sha256": "2d6c1971e18b29d2b90132786f4c14bc6c496bcf3e378db52ad1f6d3d932f165"
+    },
+    "tutorials/hub-harness.jpg": {
+      "kind": "original photograph",
+      "source": "docs/assets/body-assembly/originals/01-hub-harness.jpg",
+      "details": "HUB with four 3-wire harnesses. Does not show battery, HAT or servo endpoints.",
+      "sha256": "08d1b56f46ff0d9a79907fb99f0721dbabb99ca49ad109739eb5ca33e3f2f544"
+    },
+    "tutorials/hub-imu-wiring.jpg": {
+      "kind": "original photograph",
+      "source": "docs/assets/body-assembly/originals/02-body-prewire.jpg",
+      "details": "HUB connected to IMU and two servos during body prewiring. It is a component connection reference, not a complete HAT/HUB/IMU-only test bench.",
+      "sha256": "2b6cb7b5ea352181f6158642c98ea24499bcfa37d9b302467997300591d72139"
+    },
+    "tutorials/imu-installed.jpg": {
+      "kind": "original photograph",
+      "source": "docs/assets/body-assembly/originals/03-imu-holder.jpg",
+      "details": "Installed IMU and body harness orientation reference.",
+      "sha256": "63f68577982b0abeaab1a7fb2e1c3ec5619c6bffccd5c00eb66337f06a6e4b56"
+    },
+    "tutorials/hat-speaker-wiring.jpg": {
+      "kind": "original photograph",
+      "source": "docs/assets/head-assembly/originals/04-hat-wiring.jpg",
+      "details": "HAT and connected speaker; empty microphone sockets; includes ToF wires.",
+      "sha256": "b77bf1c0e450af101b83ad3105f204594aa4b267b5f060fb8c129f2d468427cc"
+    },
+    "tutorials/hat-zero-wiring.jpg": {
+      "kind": "original photograph",
+      "source": "docs/assets/head-assembly/originals/05-head-overview.jpg",
+      "details": "Assembled head showing HAT/ZERO stack and speaker wiring.",
+      "sha256": "5cadb846a081a63446e2b4b653f69ba132571373fc7c9ecc02fc5512292c2a63"
+    },
+    "tutorials/robot-ready.jpg": {
+      "kind": "repository photograph",
+      "source": "docs/assets/build-robot.jpg",
+      "details": "Assembled robot usage reference, not a complete cable-routing photograph.",
+      "sha256": "6054c452e5ce9286b1d11e1c8bc480ccec95c8dcd5fbf30b4f3d0496d2dd9b8e"
+    },
+    "tutorials/battery-power.jpg": {
+      "kind": "repository photograph",
+      "source": "docs/assets/battery-screw-power.jpg",
+      "details": "Battery contact/power connection reference.",
+      "sha256": "85772c8e1c95528d8453ce553a2cba4c4f478409364ffe6d5c16680ac8ab8cbd"
+    },
+    "tutorials/numbering-wiring-white-v268.png": {
+      "kind": "imagegen edit from original user-supplied wiring photograph",
+      "source": "用户提供的接线实拍；当前包仅保留处理后的白底图片",
+      "sha256": "d30c6d2f4d553f137c2ce91d7a29de4be971d308059e5f63153a4d16da523cfc",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "mode": "RGB",
+      "white_background": true,
+      "details": "由用户实拍提亮、调整白平衡并处理为白底；保留器件与接线布局。微小丝印不保证逐像素保真。",
+      "original_sha256": "9912b0a1f2a2928eaecaee9a083b9b1f57a9b4787afd112e684a4faf0362fdaa"
+    },
+    "tutorials/hardware-wiring-white-v268.png": {
+      "kind": "imagegen edit from original user-supplied wiring photograph",
+      "source": "用户提供的接线实拍；当前包仅保留处理后的白底图片",
+      "sha256": "1854fdfe0e03da6bce4e7fe4a3ee133f893bbe4271cdcbf6ba27b46c67c1f2dd",
+      "dimensions": [
+        1086,
+        1448
+      ],
+      "mode": "RGB",
+      "white_background": true,
+      "details": "由用户实拍提亮、调整白平衡并处理为白底；保留器件与接线布局。微小丝印不保证逐像素保真。",
+      "original_sha256": "114eeed046eb700e277550bd333712ef2fa45cb306cb9d8f749eb25602b487e9"
+    }
+  },
+  "current_tutorial_photographs": {
+    "numbering": {
+      "processed": "tutorials/numbering-wiring-white-v268.png"
+    },
+    "hardware": {
+      "processed": "tutorials/hardware-wiring-white-v268.png"
+    }
+  },
+  "original_photo_entry_retained": false,
+  "tutorial_limitations": [
+    "接线照片仅作连接参考，不构成硬件测试通过的证明。",
+    "历史透明图与未处理照片已从运行包移除；原始来源哈希仍保留。"
+  ]
+}

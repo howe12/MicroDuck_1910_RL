@@ -1,0 +1,1068 @@
+{
+  "official_baseline": "1fa84386f07884e27866411bc1ba166977bced95",
+  "hardware_base": "R17 v1.0.95",
+  "models": {
+    "walk": {
+      "id": "1cbf8730eadd75a5704332c9f3c10f60",
+      "sha256": "1cbf8730eadd75a5704332c9f3c10f60bfa9412135b907831c9dbd731ce1795f",
+      "task": "Mjlab-VelStand-Rough-Backlash-MicroDuck",
+      "epochs": 9600,
+      "source_iteration": 9599,
+      "num_envs": 2560,
+      "source_policy_directory": "policies/walk",
+      "trained_action_scale": 1.0,
+      "trained_head_alpha": 1.0,
+      "trained_legs_alpha": 1.0,
+      "execution_profile": {
+        "schema": "microduck-runtime-execution/v1",
+        "model_sha256": "1cbf8730eadd75a5704332c9f3c10f60bfa9412135b907831c9dbd731ce1795f",
+        "mode": "uniform",
+        "action_scale": 1.0,
+        "head_lowpass": 0.5,
+        "legs_lowpass": 0.7
+      },
+      "deployment_verified": false
+    },
+    "sitstand": {
+      "id": "1c94934c6421ec72ed48079cea749668",
+      "sha256": "1c94934c6421ec72ed48079cea74966868a7a59f7d732e0207d0f7bdaeed3c50",
+      "task": "Mjlab-SitStand-Flat-MicroDuck"
+    },
+    "ground_pick": {
+      "id": "b14e3a8b56ddbb8d2d831e727774a168",
+      "sha256": "b14e3a8b56ddbb8d2d831e727774a168c8f5b00194e3e431ae7593a840498c69",
+      "task": "Mjlab-GroundPick-Flat-Backlash-MicroDuck",
+      "epochs": 10000,
+      "source_iteration": 9999,
+      "num_envs": 4096,
+      "base_action_scale": 1.0,
+      "head_alpha": 1.0,
+      "legs_alpha": 1.0,
+      "target_filter": "passthrough",
+      "deployment_verified": false,
+      "source_policy_directory": "policies/ground_pick"
+    },
+    "roulade": {
+      "id": "59e15d7b04d0c40e9b11b8a70bdecae6",
+      "sha256": "59e15d7b04d0c40e9b11b8a70bdecae6da87a5e096efc204fb58eea304fcbbac",
+      "task": "Mjlab-Roulade-Flat-MicroDuck",
+      "epochs": 10000,
+      "source_iteration": 9999,
+      "num_envs": 4096,
+      "base_action_scale": 1.0,
+      "head_alpha": 1.0,
+      "legs_alpha": 1.0,
+      "target_filter": "passthrough",
+      "deployment_verified": false,
+      "source_policy_directory": "policies/roulade",
+      "runtime_duration_s": 3.0,
+      "training_export_duration_s": 1.0,
+      "duration_override_source": "robotd-profile.toml policy.skill[name=roulade].duration"
+    },
+    "kick_right": {
+      "id": "67ad09d82f4865d222a7ae06f250cf9f",
+      "sha256": "67ad09d82f4865d222a7ae06f250cf9f77f08c27e4f019ee3f7e431a764419fd",
+      "task": "Mjlab-BallKick-Flat-MicroDuck",
+      "epochs": 10000,
+      "num_envs": 4096,
+      "base_action_scale": 1.0,
+      "head_alpha": 1.0,
+      "legs_alpha": 1.0,
+      "target_filter": "passthrough",
+      "duration_seconds": 0.5,
+      "deployment_verified": false
+    },
+    "kick_left": {
+      "id": "ee0376c927044cdece056ba1d3e6eac7",
+      "sha256": "ee0376c927044cdece056ba1d3e6eac77b3e02ee3f701f1feb437c183ed39a6d",
+      "task": "Mjlab-BallKickLeft-Flat-Backlash-MicroDuck",
+      "epochs": 10000,
+      "num_envs": 4096,
+      "base_action_scale": 1.0,
+      "target_filter": "passthrough",
+      "duration_seconds": 0.5,
+      "deployment_verified": false
+    },
+    "play_dead": {
+      "id": "9203bb8f5df15cffaa29f5315a722835",
+      "sha256": "9203bb8f5df15cffaa29f5315a722835c1bd718b940b14330f97556ccab83065",
+      "task": "Mjlab-PlayDead-Flat-MicroDuck",
+      "engine": "official_v8",
+      "task_adapter": "hd1910-v8",
+      "epochs": 3000,
+      "checkpoint": 2999,
+      "num_envs": 4096,
+      "bam_profile": "legacy_sts3215_m6",
+      "runtime_actuator": "STS3215Actuator",
+      "action_scale": 1.0,
+      "head_lowpass": 1.0,
+      "legs_lowpass": 1.0,
+      "duration_s": 5.0,
+      "chain": false,
+      "finish": "existing_combined_walk_zero_command",
+      "hardware_verified": false
+    }
+  },
+  "global_settings": {
+    "action_scale": 0.7
+  },
+  "protocol": "official IPC, unchanged native raw telemetry, persistent SSH web input",
+  "startup_flow": {
+    "steps": [
+      "configuration_and_ipc",
+      "hardware_first_valid_sample",
+      "models_and_controller",
+      "first_completed_control_cycle"
+    ],
+    "uart_startup_hooks": false,
+    "uart_configured_ack": false,
+    "uart_generation_state_file": false,
+    "extra_cold_reopen": false,
+    "hardware_wait_interval": "existing official startup interval",
+    "ipc_available_while_hardware_waits": true,
+    "control_thread_exit_notification": true,
+    "state_transport": "robot.startupSubscribe change events plus initial snapshot",
+    "imu_ready_samples": 25,
+    "max_short_waits": 24,
+    "short_wait": "existing control period",
+    "nominal_wait_at_50hz_ms": 480,
+    "fault_backoff_seconds": 1,
+    "unchanged_ready_guard": true,
+    "startup_target_gain_torque_writes": false,
+    "new_threads_or_loops": false,
+    "steady_control_work_added": false
+  },
+  "web_input": {
+    "path": "browser WebSocket -> persistent SSH helper -> official robotd IPC",
+    "physical_pad_priority": true,
+    "device_detection": "initial snapshot plus kernel input uevents",
+    "discovery_polling": false,
+    "virtual_webpad": false,
+    "idle_wait": "blocking selector; timeout only for an active web input lease",
+    "stale_action_replay": false,
+    "input_lease_seconds": 0.6
+  },
+  "media_build": "1fa8438-feetech-media-demand.1",
+  "toolchain": "Rust 1.99.0 / cargo-zigbuild 0.23.4 / Zig 0.15.1; aarch64-unknown-linux-gnu.2.31",
+  "hd1910_runtime_settings": {
+    "p": {
+      "source": "model_contract",
+      "address": 50,
+      "bytes": 1,
+      "restore_on_relax": true,
+      "existing_readback_preserved": true
+    },
+    "d": {
+      "value": 0,
+      "address": 51,
+      "bytes": 1
+    },
+    "torque_limit": {
+      "value": 1000,
+      "address": 48,
+      "bytes": 2,
+      "byte_order": "little"
+    },
+    "write_trigger": "V164 explicit arm flow",
+    "fixed_settings_readback_added": false,
+    "eeprom_changed": false
+  },
+  "hotspot_revision": "R10-boot-only",
+  "component_limits": {
+    "per_file_bytes": {
+      "maintenance_worker.py": 98304,
+      "board_audio.py": 65536,
+      "ai_hat_audio.py": 65536,
+      "ai_audio_meter.py": 65536
+    },
+    "total_bytes": 131072,
+    "request_bytes": 262144
+  },
+  "console_version": "1.0.297",
+  "service_build": "1fa843-feetech-ft6-control.102",
+  "release_label": "V297 Test (Beta)",
+  "release_channel": "test",
+  "publication_hold": true,
+  "repository_published": false,
+  "generated_at_utc": "2026-11-17T17:00:00Z",
+  "hardware_verified": false,
+  "firmware_reinstall_required": false,
+  "service_package_sha256": "18cecba4840e70c273c8fc5534cf5bd3e8386666f67b794c954d4ce3d0b74776",
+  "maintenance_component_id": "20b83930ba7dad8f0753d416dc8156b2a5b7647748ab8b4560db7a92901affe6",
+  "package_baseline": "V296 / control.102",
+  "baseline_zip_sha256": "c5fc7b131b6b7ce605d42d06c29068e5f710aa7800b56f6c1dd144ac64148b5b",
+  "console_source_distribution": "Microduck-Console-Studio-V297-Test.zip",
+  "native_binaries_changed": false,
+  "native_payload_changed": false,
+  "native_logic_changed": false,
+  "native_instructions_changed": false,
+  "native_recompiled": false,
+  "production_scope": {
+    "pc_backend_changes": [
+      "mode_switch_observer.py",
+      "service_control.py"
+    ],
+    "pc_metadata_cleanup": [
+      "static/four-pages.js",
+      "static/assets/asset-sources.json"
+    ],
+    "zero_logic_changes": [],
+    "native_logic_changes": []
+  },
+  "release_changes": [
+    "硬件初始化等待时及时释放模式管理任务，测试与编号入口可用；包括缺 IMU、缺单颗或多颗舵机。",
+    "保留具体中文原因与原始错误；硬件就绪仍看实际反馈。",
+    "清理旧验证归档、堆叠历史文档及弃用接线图片；保留当前说明、验证源码和必要运行文件。"
+  ],
+  "cleanup": {
+    "removed_files": {
+      "docs/UPDATE-V292.zh-CN.md": {
+        "bytes": 2779,
+        "sha256": "76c07915a5df2de652435880df605c279c52e29438168a229adf09c81f362ec1"
+      },
+      "docs/releases/R146.md": {
+        "bytes": 6867,
+        "sha256": "5135e5ab09f26dd27d728e1fdaf54f1178367b68bf174f0c46b1b2d84d5d1f39"
+      },
+      "docs/releases/R147.md": {
+        "bytes": 4592,
+        "sha256": "ee2c08f1bb0e8b1f87ebbd43f2ecb082c20ad4f81f5333af8b6be39a5ed6f237"
+      },
+      "docs/releases/R149.md": {
+        "bytes": 969,
+        "sha256": "74dfcbd5c5bc7ff9fc90e52e86a7eaaaef90b21dbf88aa12ac00c08a5f63d60e"
+      },
+      "docs/releases/R150.md": {
+        "bytes": 2659,
+        "sha256": "07cb35e3e4a3ccb165651536bb44789c30eac49033ff9e43b7f55cce30e518ff"
+      },
+      "docs/releases/R151.md": {
+        "bytes": 3368,
+        "sha256": "0708ad6eed0a5c0280340a64e6006b7868c5929f6dfe0b36e07f5049721579cd"
+      },
+      "docs/releases/R152.md": {
+        "bytes": 2660,
+        "sha256": "64287ad04d69aa78b8219d8dd4c8e59fb6b20181cb9599c888de9a7936c13d3e"
+      },
+      "docs/releases/R153.md": {
+        "bytes": 3096,
+        "sha256": "661c150995c174fcc7ca7bb540eb153dfdf0a64aedf5e19c4127aeb9da6b7742"
+      },
+      "docs/releases/R154.md": {
+        "bytes": 2649,
+        "sha256": "bb9ac304055624e16f3176e3333749b0fa82bfa806457f80480dcb304b0ebb74"
+      },
+      "docs/releases/R155.md": {
+        "bytes": 3332,
+        "sha256": "354b40b31be7e8119646f541db6ae004c2829c9904b2f14319b8206a247b54c0"
+      },
+      "docs/releases/R156.md": {
+        "bytes": 2078,
+        "sha256": "5e76e07d9ec6a8bdc2a5f795a2c6d914c090c2fdc566a5db91252a2d0ded670d"
+      },
+      "docs/releases/R157-Fix1.md": {
+        "bytes": 2600,
+        "sha256": "201b5fb9ab334669432f7dae7bc7734b856453fc18136307c7fb7ae576e8b1e4"
+      },
+      "docs/releases/R157-Fix10.md": {
+        "bytes": 1576,
+        "sha256": "1c5c1d6cb20634b3e2143f84a132b3384f686edecd795a62d124bfe65965c4e4"
+      },
+      "docs/releases/R157-Fix2.md": {
+        "bytes": 3230,
+        "sha256": "cfea6e4a1922cdc68813571d36d94263105d70955c4c550290c8613cd77f3115"
+      },
+      "docs/releases/R157-Fix3.md": {
+        "bytes": 2751,
+        "sha256": "35a664f76c90b43b2447079d963e2c633701a5d56ba2cf5461f8827aa72634ca"
+      },
+      "docs/releases/R157-Fix4.md": {
+        "bytes": 4225,
+        "sha256": "65a481a1944e978d2a766a71f3a427d5dba7ea19f3444d4817783364bc52ed69"
+      },
+      "docs/releases/R157-Fix5.md": {
+        "bytes": 2466,
+        "sha256": "6c6f2188ac554951e6a41d5cf720390a1a1df321f74761163872a234ee6369de"
+      },
+      "docs/releases/R157-Fix6.md": {
+        "bytes": 4491,
+        "sha256": "97c6f6bdea0cda8021d2de84dd1cddf49c0ad09866b49c697fbe5ec298602fbe"
+      },
+      "docs/releases/R157-Fix7.md": {
+        "bytes": 495,
+        "sha256": "a4f5eacb1e934294fc0f412d9524caca9331f0248b94cc69b47db66f7da3611c"
+      },
+      "docs/releases/R157-Fix8.md": {
+        "bytes": 852,
+        "sha256": "1b49fdb042c0eafdee071a6b8ab2bb40a94f2fa03e069d330ade5afb6d48d871"
+      },
+      "docs/releases/R157-Fix9.md": {
+        "bytes": 1007,
+        "sha256": "de613a4b96028f1c2e1d06e4d2e4a10dfcb93080772cc02c4944ff2f2fd9b200"
+      },
+      "docs/releases/R157.md": {
+        "bytes": 3582,
+        "sha256": "686a7b5c135a584ad6a7d4c753710d8f1c6d5281515e45094fb688c969203646"
+      },
+      "static/assets/tutorials/hardware-wiring-source-v267.jpg": {
+        "bytes": 178107,
+        "sha256": "114eeed046eb700e277550bd333712ef2fa45cb306cb9d8f749eb25602b487e9"
+      },
+      "static/assets/tutorials/hardware-wiring-v267.png": {
+        "bytes": 1150182,
+        "sha256": "a2f25cd82bdf9a54466f3f360980a44b412cbfa19b4bc5c1f97458ba339d97cb"
+      },
+      "static/assets/tutorials/numbering-wiring-source-v267.jpg": {
+        "bytes": 180201,
+        "sha256": "9912b0a1f2a2928eaecaee9a083b9b1f57a9b4787afd112e684a4faf0362fdaa"
+      },
+      "static/assets/tutorials/numbering-wiring-v267.png": {
+        "bytes": 1046084,
+        "sha256": "f48a8ddd1535f13f54815296f5c631851a98770a6ff670c0994bfe5bf7f80ef6"
+      },
+      "verification/history-through-v281.tar.gz": {
+        "bytes": 1482396,
+        "sha256": "f4db61fdf4df158b1d270f41de666a515223db4c46f5e54864f0ebdc4f59d45c"
+      },
+      "verification/v282/RELEASE-V282.py": {
+        "bytes": 48175,
+        "sha256": "9dd491da06b50ea1304a9244f145200b001cdfcafecd211bdb90c07af24995b8"
+      },
+      "verification/v282/calibration-results.json": {
+        "bytes": 1762,
+        "sha256": "c7defc78b7c0509770e26b049ccfaafdd29e32b689f39698ea2fce052ca590cc"
+      },
+      "verification/v282/calibration-tests.cjs": {
+        "bytes": 11225,
+        "sha256": "6284dfe2cf8f146fc7692942bcfd3783f741c81127f07066ecf2fb4183388c1c"
+      },
+      "verification/v282/independent-review.json": {
+        "bytes": 19272,
+        "sha256": "47464ae6e25fbcc4b74a122467830d3a0d377f6649ad0c6b0f1d43508e48b669"
+      },
+      "verification/v282/lifecycle-results.json": {
+        "bytes": 2667,
+        "sha256": "792de8d3f9fb484daaec5f53a6ddab8a2947552d3f4fe0f768b4d3f58129ebde"
+      },
+      "verification/v282/lifecycle-tests.mjs": {
+        "bytes": 17421,
+        "sha256": "c75b140d79172d969b670c37b9ee1b11abf0d76236256f0d0e4858c70c3f4ccc"
+      },
+      "verification/v282/log-results.json": {
+        "bytes": 2206,
+        "sha256": "3bdc8b14c392949dac49db249d5868f93ec9c62fda8b3cf537c776b0ede1340e"
+      },
+      "verification/v282/log-tests.mjs": {
+        "bytes": 10782,
+        "sha256": "780a3a27d72ffe7e6f0e0b1475807cd7c7c03d212e18a9ac0ae1b3504c97f4e3"
+      },
+      "verification/v282/mode-results.json": {
+        "bytes": 3164,
+        "sha256": "52819bea054262367ca9b11d5381d386de70554c65d5b2852683b8fcf613029d"
+      },
+      "verification/v282/mode-tests.mjs": {
+        "bytes": 14728,
+        "sha256": "5019a34da738d3ced5656a08f8607fe21a8eab4cca4c4cf76b2538f9df132cc7"
+      },
+      "verification/v282/root-review.json": {
+        "bytes": 9773,
+        "sha256": "f8784362ad9d254caa4bb96ee2ddb5f5d06f86a7b22d467695657cf1c807a265"
+      },
+      "verification/v282/swap-backend-results.json": {
+        "bytes": 78202,
+        "sha256": "24bcd3df571200fa940cfbce51552cc0a644ee88d4f13516bd65d70cc68b2149"
+      },
+      "verification/v282/swap-backend.py": {
+        "bytes": 35047,
+        "sha256": "b34501c88efe3fde9556bb607de92089fa1dc86c82a6bcd5fe9161a03a5325e5"
+      },
+      "verification/v282/swap-front-results.json": {
+        "bytes": 3858,
+        "sha256": "2a7cc3fcfb1c062c2ed7201d19e48857a3075bcd4015304952a32871108f753f"
+      },
+      "verification/v282/swap-front.mjs": {
+        "bytes": 23376,
+        "sha256": "213f2e9ecdb76762a3c8750d3f01218dd0afc39f8f3f0b638273ee1fb96f20f0"
+      },
+      "verification/v283/RELEASE-V283.py": {
+        "bytes": 22869,
+        "sha256": "cc5fe4c7f83c6f3a1a72a8123a7475ac7163e522c057a45665517f2f93a7cba1"
+      },
+      "verification/v283/calibration-results.json": {
+        "bytes": 1762,
+        "sha256": "3d1822ec8b0db859010c488672112ce912c60e67cbc22a6138ad5c448f8169db"
+      },
+      "verification/v283/calibration-tests.cjs": {
+        "bytes": 11225,
+        "sha256": "463d3826c97425d29f7808c49cccec439cc4ab1d1b15e4dbde997376fa3ae898"
+      },
+      "verification/v283/lifecycle-results.json": {
+        "bytes": 2667,
+        "sha256": "2ae034cafb95823207b7a968dd29bc36fcb3f264e7523ebf30c1634f1c817bfe"
+      },
+      "verification/v283/lifecycle-tests.mjs": {
+        "bytes": 17421,
+        "sha256": "5d36483ce8d119e954aeee58d49fcc61340af2cbf75c01f9624ad36da9ae941f"
+      },
+      "verification/v283/log-results.json": {
+        "bytes": 2206,
+        "sha256": "5d7873f8149a1f3a555e5c49bb0d202fc1a07761916c886857fcbfb622fe802c"
+      },
+      "verification/v283/log-tests.mjs": {
+        "bytes": 10782,
+        "sha256": "31ebc4f9ee4c5c28a083110f57cc1f8b6b0bbf9d81e3ff5bbd888e1cf0675aba"
+      },
+      "verification/v283/mode-results.json": {
+        "bytes": 3164,
+        "sha256": "d532c695ba7a160619b85fcb3a1e231ae6098f3d9f554c3ba6a148f97d97ab5e"
+      },
+      "verification/v283/mode-tests.mjs": {
+        "bytes": 14728,
+        "sha256": "5edb588bc7dcdccfbe299b59cae595506a36e8366847ed207e9a45cc0822cca8"
+      },
+      "verification/v283/protocol-and-recovery.json": {
+        "bytes": 1161,
+        "sha256": "9408099fb46de227d1b8cc3b751f78de96d168104bf960538bf0920c32d71de4"
+      },
+      "verification/v283/root-review.json": {
+        "bytes": 4295,
+        "sha256": "32f7458c112a1f881737a46bb0294786f21608b5f4cb8d55908f1c2400658a34"
+      },
+      "verification/v283/swap-backend-results.json": {
+        "bytes": 80029,
+        "sha256": "b44c0d0da7a12301475c34a04a3e197a838e7ff2b6919fa3087abf1376af1db4"
+      },
+      "verification/v283/swap-backend.py": {
+        "bytes": 43979,
+        "sha256": "64812a04834d99515a21a0c802e4f55b4e481eef35c59cf33a49bea5e93f37a6"
+      },
+      "verification/v283/swap-front-results.json": {
+        "bytes": 4429,
+        "sha256": "35d48fd3296732dfd7ad90301109e007f02da286e5be40b793382a0174414f0c"
+      },
+      "verification/v283/swap-front.mjs": {
+        "bytes": 27644,
+        "sha256": "ec4a4011851df592cde60fe4126d9ec3a5415f80d8526b6b63591f3d69c84aa6"
+      },
+      "verification/v284/RELEASE-V284.py": {
+        "bytes": 19516,
+        "sha256": "3447863c0b091119a39366485b45e699d212373d3ea0d01384af3f93edf5887d"
+      },
+      "verification/v284/calibration-results.json": {
+        "bytes": 1762,
+        "sha256": "106bbc8be6006cd6e859e8e86ef7d55d1f0e6eb40fa9365aa54a9e02bf42f647"
+      },
+      "verification/v284/calibration-tests.cjs": {
+        "bytes": 11225,
+        "sha256": "c5c5f6634e30b05bcafe39eb349b6c8a790e43a4391bf4d679e0024ddaeb9dc2"
+      },
+      "verification/v284/lifecycle-results.json": {
+        "bytes": 2667,
+        "sha256": "c49f409de273cad34f9673c4cef0ef659a7e0df8e0e5ece2420ce066cb951f5b"
+      },
+      "verification/v284/lifecycle-tests.mjs": {
+        "bytes": 17421,
+        "sha256": "d0e7e9ec0bf7f3157d9686ddc14f524c956e8bf6dea5566ea52cc73c234b28f3"
+      },
+      "verification/v284/log-results.json": {
+        "bytes": 2206,
+        "sha256": "d07711eafa0bc0a3435a88516694b29a72b9b57ae3e94df387a1df2709f64582"
+      },
+      "verification/v284/log-tests.mjs": {
+        "bytes": 10782,
+        "sha256": "41b0af38a9df127b457a42966a073ba4de2e7ef150cb265f4f64a9749031deae"
+      },
+      "verification/v284/mode-results.json": {
+        "bytes": 3164,
+        "sha256": "71233e68c2511c0af41aabadc3c675040920d7dc8a0af63c526d3854ae802878"
+      },
+      "verification/v284/mode-tests.mjs": {
+        "bytes": 14728,
+        "sha256": "f0129bea1269efb1f8394e4b7a6a711fc6c218f3dbcd9324b3b91f9c4fd36884"
+      },
+      "verification/v284/root-review.json": {
+        "bytes": 3610,
+        "sha256": "f3d19244eee598ea3d14ba16e98034553ce0dec3324e94648572c68567bcc532"
+      },
+      "verification/v284/swap-backend-results.json": {
+        "bytes": 80561,
+        "sha256": "cf276377ccb39d2dcfe813ce6513b1e6745346b57a74452efe56be9274ee39c8"
+      },
+      "verification/v284/swap-backend.py": {
+        "bytes": 47248,
+        "sha256": "21376db0b38b75a3705369a3e590613aaebfcc424b29995ceecbe58dd5db0347"
+      },
+      "verification/v284/swap-front-results.json": {
+        "bytes": 5204,
+        "sha256": "db289edba715697391f2ab5b04820268694f646e2104fc63a866a4f0ddbe7086"
+      },
+      "verification/v284/swap-front.mjs": {
+        "bytes": 32632,
+        "sha256": "ae2b3a8a6bf4fc4c8f8c731d79e1af593bc6951b108fb044daabd3174f9c3851"
+      },
+      "verification/v285/RELEASE-V285.py": {
+        "bytes": 21077,
+        "sha256": "092d76d921d4cab781f8da7608e6e54a63f880a92d3681b83c7b2a71d1f32cc9"
+      },
+      "verification/v285/calibration-results.json": {
+        "bytes": 1762,
+        "sha256": "cc3187934c1cad1208e3c18fed5a95ee65e2890d486e6a9f90a2546814c2d870"
+      },
+      "verification/v285/calibration-tests.cjs": {
+        "bytes": 11225,
+        "sha256": "e3163980931e2e080dbeebcadd1063ae9f5d279ae99e00e273db930d41426c64"
+      },
+      "verification/v285/lifecycle-results.json": {
+        "bytes": 2667,
+        "sha256": "cb50008f25726792c7ad02d809d47a76f14cd866fffd72673e885751f5fb2205"
+      },
+      "verification/v285/lifecycle-tests.mjs": {
+        "bytes": 17421,
+        "sha256": "e55b1e532173e7ad01dc840dbd166f85cd957d7667ff280ec11e29eee7a7ecc1"
+      },
+      "verification/v285/log-results.json": {
+        "bytes": 2206,
+        "sha256": "2e89b434fd378d09212de307ef677a8bb4abaf539883b9e729628a45829395c5"
+      },
+      "verification/v285/log-tests.mjs": {
+        "bytes": 10782,
+        "sha256": "b0cad4a6559eb977c626efc81be3d592e9b74501cd62ebc077743f289005bcd1"
+      },
+      "verification/v285/mode-results.json": {
+        "bytes": 3345,
+        "sha256": "f87f2ca6bfd355e9d7cb43f1f3c42c8dcd8bc1334ce0e2098927f6af0101501c"
+      },
+      "verification/v285/mode-tests.mjs": {
+        "bytes": 16380,
+        "sha256": "3852d48b566050c94a57021f412f2285c34fd1ebd3ff3a3fd955f19976c94b43"
+      },
+      "verification/v285/root-review.json": {
+        "bytes": 5418,
+        "sha256": "52204f4354ae80121d6c0e9937bd871440186894b3307cb3a5f3d724c22cc9d3"
+      },
+      "verification/v285/swap-backend-results.json": {
+        "bytes": 102018,
+        "sha256": "a8a101fc3efe9f948c969bb261f98dd9e3c7e8daa9e0794d86d0682a4782ac87"
+      },
+      "verification/v285/swap-backend.py": {
+        "bytes": 53448,
+        "sha256": "a8ffc64d084eb19426facad3f426cbec12c59cf886b3d5201453872bd0e7c5b6"
+      },
+      "verification/v285/swap-front-results.json": {
+        "bytes": 6158,
+        "sha256": "790df11f74bf3db3888754f04d929e12bd4ce542e57974128ac6bd09b5381819"
+      },
+      "verification/v285/swap-front.mjs": {
+        "bytes": 38732,
+        "sha256": "5d5546dbff340e2c719e7dac5031fe8e7c8dec2e05b594da58e493dbab0891ef"
+      },
+      "verification/v286/RELEASE-V286.py": {
+        "bytes": 19937,
+        "sha256": "e0077f5dde085dc5186b0461b23c425fa961fed7b42ddd84683392d4f2e91cfc"
+      },
+      "verification/v286/calibration-results.json": {
+        "bytes": 1728,
+        "sha256": "4384d5b88a8147d942a34c099d1d8fb7fcbc8cc261f5030aeafed92b5d4dde49"
+      },
+      "verification/v286/calibration-tests.cjs": {
+        "bytes": 11462,
+        "sha256": "c1a6ea947c5c79f1aec77253343706c71b26832be2a351ffffa92e6f7f540ac3"
+      },
+      "verification/v286/controller-results.json": {
+        "bytes": 1908,
+        "sha256": "4a8b543d1eadf48cc93c55c7b38ea04a8e40a627336651bfd01a217e28ae6ad3"
+      },
+      "verification/v286/controller-tests.cjs": {
+        "bytes": 11860,
+        "sha256": "e10583a1ff93b9844be6c8a0a3e84acd8721ded6fb78a078c557f7e6a0422616"
+      },
+      "verification/v286/log-results.json": {
+        "bytes": 1657,
+        "sha256": "ce96d85cbc65ba69b89fe8d7d696b878eb7cd331f2d2a1b184a1b0981e4a5bb9"
+      },
+      "verification/v286/log-tests.mjs": {
+        "bytes": 7264,
+        "sha256": "6d1bce6e6b4d62fd7f12555a2e0717946fe90eb25be795b053c7b0714a7f6e8b"
+      },
+      "verification/v286/root-review.json": {
+        "bytes": 1770,
+        "sha256": "727bda1789c60be30468a6fbc265315572dcdf40ebb2c4525f4850474fc79669"
+      },
+      "verification/v287/RELEASE-V287.py": {
+        "bytes": 17881,
+        "sha256": "3e6cd88285b47c05ff449ca7102a78e989e4d1a034ba6354f42343115efd1002"
+      },
+      "verification/v287/controller-results.json": {
+        "bytes": 8298,
+        "sha256": "6aca46f94967c554dd6e6b466ca04c94bfb03744c5184f811afbe1a15d57b1b8"
+      },
+      "verification/v287/controller-tests.cjs": {
+        "bytes": 14837,
+        "sha256": "b3ca27218e7853644645817dc2c44331338600a525dcbcd65beb0f165176e07c"
+      },
+      "verification/v287/root-review.json": {
+        "bytes": 1289,
+        "sha256": "04d5a268d9028611f627d4231dd48f93404b3939a04963573c86700cdf61301e"
+      },
+      "verification/v287/select-backend-results.json": {
+        "bytes": 1561,
+        "sha256": "11da465887492481f60eaa4f55c14888a13af132a5dfe57cc0736c840930bf2a"
+      },
+      "verification/v287/select-backend.py": {
+        "bytes": 3093,
+        "sha256": "4e19b231b6ba915d089ce877c9294eba3d398e6afdf879ff72d2b0bfe4d0c8b3"
+      },
+      "verification/v288/RELEASE-V288.py": {
+        "bytes": 17353,
+        "sha256": "20b9077a0498fbd288a2322f62ae55b79e8d837b95a5a5d515fe935203934766"
+      },
+      "verification/v288/log-results.json": {
+        "bytes": 2180,
+        "sha256": "b5b73e9eaf517d2330e407953f869290f45b0d4670ccdb0d3aad51ecfc99a554"
+      },
+      "verification/v288/log-tests.mjs": {
+        "bytes": 10225,
+        "sha256": "47763f9a84e2b182ebda6e93c72c8aa56fca06f7cd21a5609394fb4394a00e3a"
+      },
+      "verification/v288/root-review.json": {
+        "bytes": 1367,
+        "sha256": "3624f02bdfe53508b7e2eceebe29cfa7c9f73ef1debf654061677f89db90ed2d"
+      },
+      "verification/v289/RELEASE-V289.py": {
+        "bytes": 17829,
+        "sha256": "38c95f8d6d330910f895232a2514aca4629cac4244bcb57e46d1a88fee2aa45b"
+      },
+      "verification/v289/log-results.json": {
+        "bytes": 2180,
+        "sha256": "0d24bc183bdb4b026afed2d5e7f57ca3c16cf8afbc6263659b4410a391b9a67e"
+      },
+      "verification/v289/log-tests.mjs": {
+        "bytes": 10347,
+        "sha256": "d2021b77a6e956c7146ec0058451393742572c4772898fcf4c6656c54c882d93"
+      },
+      "verification/v289/maintenance-events-results.json": {
+        "bytes": 1420,
+        "sha256": "710ae6d2a074c4cee5801723e16e0681dda5bb0496eb5e1940a087c78ba46ad5"
+      },
+      "verification/v289/maintenance-events.cjs": {
+        "bytes": 9572,
+        "sha256": "67712d6c5cde1b6022258412d0ec5518f96b2cbdb307739e5da4db4ff2371a1b"
+      },
+      "verification/v289/root-review.json": {
+        "bytes": 1316,
+        "sha256": "d04e2095ada0b9b961f3fa849cfb25f032e84eabba64bc7ac3ed501c986a40da"
+      },
+      "verification/v290/RELEASE-V290.py": {
+        "bytes": 20882,
+        "sha256": "36a69a52efdce65202f3e85a308e9e18c034241eaf4261aae308ca3374545de4"
+      },
+      "verification/v290/audio-backend-results.json": {
+        "bytes": 3319,
+        "sha256": "0ac52be9891285a262af32135335129b4fdb57e76714f07c43213c4e60cad679"
+      },
+      "verification/v290/audio-backend.py": {
+        "bytes": 4714,
+        "sha256": "93eca46887f44c9d8561b0da3b926cbeb2e8e0b8ab2ca7177fb42b4dd57fed01"
+      },
+      "verification/v290/log-results.json": {
+        "bytes": 2290,
+        "sha256": "0af7a9248795d578446dcaaff1c6625a9f8af2c15fa27c0591d4787e6f4da613"
+      },
+      "verification/v290/log-tests.mjs": {
+        "bytes": 11124,
+        "sha256": "9868351379c791952a25d563efd85bfc0cbba3e38bf5a50eb8003104f7db3c61"
+      },
+      "verification/v290/root-review.json": {
+        "bytes": 1943,
+        "sha256": "4faaa28d60c492773cb07495b7249270928fa92dae74541a579e461bc9d943a0"
+      },
+      "verification/v290/speaker-front-results.json": {
+        "bytes": 1954,
+        "sha256": "98f6e7e847a7f0312d847321e8a21eb636ced7fbe020926099170cbb02e07c21"
+      },
+      "verification/v290/speaker-front.mjs": {
+        "bytes": 8626,
+        "sha256": "1b4d4367e8a436ad519c970a29f788c1bb7b15edbb16c8d4b600b3088bfd35e1"
+      },
+      "verification/v291/RELEASE-V291.py": {
+        "bytes": 17521,
+        "sha256": "40e874c79a605decbd31749a7007540c7c2cc665fde6c0f22d97acdcf1a7ed11"
+      },
+      "verification/v291/lifecycle-results.json": {
+        "bytes": 2695,
+        "sha256": "3a66380573a4852933023f4586ae4a6f5024fa6c3f80f6a1a7edc28f39acbd34"
+      },
+      "verification/v291/lifecycle-tests.mjs": {
+        "bytes": 17524,
+        "sha256": "b59feddb22659327a8831dc6981d4deac2c3e74e8065b75c4c191e3460a15cdc"
+      },
+      "verification/v291/root-review.json": {
+        "bytes": 1366,
+        "sha256": "a93ce19900bd20cf0cb97e116e27748488b93814b3bd63c95a9d41a0117fcf1a"
+      },
+      "verification/v292/RELEASE-V292.py": {
+        "bytes": 16619,
+        "sha256": "e62b8f6ce31493a2745e5e69bdbbab47e1789b4c8674977b2fe49894ef416dea"
+      },
+      "verification/v292/root-review.json": {
+        "bytes": 1390,
+        "sha256": "9bd554aa01f3cc6e27e589ccd053dd9e196d56aa515c94e4fa8a1f43d37644f1"
+      },
+      "verification/v293/RELEASE-V293.py": {
+        "bytes": 22615,
+        "sha256": "b6bebe8fd4eabda2b9d5a8da06bd8a14e3caba8479e7dc00596d1b3bb2576c51"
+      },
+      "verification/v293/audio-backend-results.json": {
+        "bytes": 3904,
+        "sha256": "d7e9cad63e7c66378b57316d475c705217531521f3934ddca33c5984309f05ce"
+      },
+      "verification/v293/audio-backend.py": {
+        "bytes": 6859,
+        "sha256": "e57c6c9f712c408e92704d97a6fa71d6f60a1e8d46ca915803efade11461235e"
+      },
+      "verification/v293/lifecycle-results.json": {
+        "bytes": 2756,
+        "sha256": "6b2414463ffe88775e85af43d2a9b91ea186e98ba6e835cc7fb8450de1fb7977"
+      },
+      "verification/v293/lifecycle-tests.mjs": {
+        "bytes": 19216,
+        "sha256": "d1a04406c478a0f29fbba676e99cfc7db7184786dcec741188e8e4f8b17ffd0c"
+      },
+      "verification/v293/log-results.json": {
+        "bytes": 2290,
+        "sha256": "ffeb1d01d8839ca46d78094139324987f0621d2a174b0c450bd79375a39c2fe6"
+      },
+      "verification/v293/log-tests.mjs": {
+        "bytes": 11124,
+        "sha256": "3b8b0f282c7c7600934827d126565226b91edad36f8f8c69c323d1cac0adb89c"
+      },
+      "verification/v293/mode-results.json": {
+        "bytes": 3601,
+        "sha256": "85da98c2e28b5dd71b4b6957f5101f4a3afc4e52d9a9252ee3c665fa3a769e8b"
+      },
+      "verification/v293/mode-tests.mjs": {
+        "bytes": 18523,
+        "sha256": "3784ac890abc7fb32d1a79da3745abda921727e5f03b4a49537e8188bc68293a"
+      },
+      "verification/v293/root-review.json": {
+        "bytes": 3014,
+        "sha256": "4d3b0e3757dba323efe2785725dfaf3a5d990bf719ed2efbadce6b915fed7c86"
+      },
+      "verification/v293/speaker-front-results.json": {
+        "bytes": 1954,
+        "sha256": "c4a187d59e13268f1c0a82dedebec68e49463f65d46fc69b152a0f58f230fd94"
+      },
+      "verification/v293/speaker-front.mjs": {
+        "bytes": 8626,
+        "sha256": "68d0c1b0c377bdb8dc7c014a11c6b0029980a5c3cb2cdde5dac9594b56777f43"
+      },
+      "verification/v293/startup-backend-results.json": {
+        "bytes": 902,
+        "sha256": "8e9627fce27000d9e3609995e6cfa4f1aa15e703b105821c52b75ae534416f5d"
+      },
+      "verification/v293/startup-backend.py": {
+        "bytes": 5059,
+        "sha256": "78a800c5e62a95e4ad700e212f87f59726d315a4d38acc689b1924c202874a00"
+      },
+      "verification/v294/RELEASE-V294.py": {
+        "bytes": 18125,
+        "sha256": "883a61fccdba296fb573d30e3b36573d52ebb321499c628b1bb4c4a8ae9375cb"
+      },
+      "verification/v294/lifecycle-results.json": {
+        "bytes": 3493,
+        "sha256": "0f17da6e1b1ea39a3f9e18b473ad93a413bbce60fe312b5f6b47c42b88bf1492"
+      },
+      "verification/v294/lifecycle-tests.mjs": {
+        "bytes": 23666,
+        "sha256": "8f0356ce77b1495dbb9c715a388e87744cf95f9d3dbddbe49c67d14d051233d5"
+      },
+      "verification/v294/root-review.json": {
+        "bytes": 1843,
+        "sha256": "ac48fa657a9b6c02fee87b39f25d4debae71e29013dfb6d817b33d1a362ef0db"
+      },
+      "verification/v294/route-backend-results.json": {
+        "bytes": 1393,
+        "sha256": "124d20aa0bd032be5de5214dad2782c84ab82661620a8f1cb671dcae3f39ac44"
+      },
+      "verification/v294/route-backend.py": {
+        "bytes": 4473,
+        "sha256": "2d2ebdf39c0f37aa69538ee24c181568c7e7aa622bf912878c0760df3a92eaf1"
+      },
+      "verification/v295/RELEASE-V295.py": {
+        "bytes": 17926,
+        "sha256": "91320c209f5533f04986ffcd5c7b589203b4189e199adb592095f507668355ef"
+      },
+      "verification/v295/lifecycle-results.json": {
+        "bytes": 3527,
+        "sha256": "008794e0090462ca07ad4a11c2163111ae610df41cb0ecdb0da12b85473dab64"
+      },
+      "verification/v295/lifecycle-tests.mjs": {
+        "bytes": 23700,
+        "sha256": "27332b095fff1a58011620e355c72377bcc9f8e31caa753090ccabc6dea4cc61"
+      },
+      "verification/v295/root-review.json": {
+        "bytes": 2288,
+        "sha256": "e295f77e241dec9eb1bb1723ec19839a552470bbdbad1992116021a61f6ff967"
+      },
+      "verification/v296/RELEASE-V296.py": {
+        "bytes": 16927,
+        "sha256": "565cdfdb119e17219ddcc934dfb955893c0a58e5b5787fece328d612368ee532"
+      },
+      "verification/v296/root-review.json": {
+        "bytes": 1836,
+        "sha256": "6e71389efd553f3c8ef3c48a5b2f63b0ece37f8188a59a09d75208191f4b011e"
+      }
+    },
+    "removed_bytes": 5694619
+  },
+  "validation": {
+    "passed": true,
+    "controlled_cases_passed": 35,
+    "reports": {
+      "mode-switch-results.json": {
+        "passed": true,
+        "cases": 14,
+        "source_sha256": {
+          "mode_switch_observer.py": "0182985aa6aa46b5a09e1e23cc5d1d2e11821053a5acf508d0cd0f248302881b",
+          "service_control.py": "1da62e7d3c9d6e4a5e5b141a30591c0fbe68dfed6ce8cb2ff29c6bcb2bae1513",
+          "workspace_control.py": "6bad135155d41a6fe83551765203c24813cfc349b2c9352f63133f3eeeab6399"
+        },
+        "boundary": "V297: real child-process/lock handling and production transport/controller.\n\nNo real service, SSH, UART, servo, IMU or motion is used.\n"
+      },
+      "lifecycle-results.json": {
+        "passed": true,
+        "cases": [
+          "ordinary focus and hide/show keep actual constructor state, drafts, DOM and existing position reader without requests or card writes",
+          "existing normal maintenance poll continues after focus without an additional loop or configuration refresh",
+          "hidden legitimate swap and IMU observations retain their actual reader eligibility while new hidden writes remain guarded",
+          "real failed position and IMU readers stay latched through ordinary focus and visibility changes without reconnects",
+          "actual pagehide keeps displayed state and drafts but invalidates freshness, and real pageshow restores one read loop without reentering or scanning",
+          "a pageshow on an already running page performs no maintenance refresh or view reset",
+          "actual APP registrations do not refresh config or recreate a healthy observer on ordinary focus visibility or initial pageshow",
+          "actual APP restores only its own unloaded cached-page observer once, and never retries a genuinely failed observer",
+          "a genuine cached-page restore initially hidden completes only its own paused observation when visible, without touching healthy or failed readers",
+          "actual scan click ACK progress and completion leave all four mode-card DOM attributes and copy unchanged",
+          "real accepted mode transitions update navigation while local center and swap locks remain enforced only at action dispatch",
+          "real switch failure unlocks all mode cards and displays one readable internal dialog without retrying or replacing the selected servo",
+          "uncalibrated motion click already in calibration displays one Chinese internal error after the real unchanged API reply instead of clearing it",
+          "a fallback that must start calibration explains the original motion rejection without claiming success or submitting a second operation",
+          "a pre-V294 backend target-only redirect still produces a readable rejection",
+          "already selected numbering explains why motion was not entered without a scan, native request or page reload",
+          "entering numbering as the prerequisite keeps one explicit entry and one rejection of the original motion click",
+          "valid new motion entry and opening an already running motion page remain successful without spurious calibration errors",
+          "V297 completed management with explicit IMU wait unlocks real menu dispatch into both bench modes without waiting for hardware readiness",
+          "V297 no ready feedback does not bypass an actually running service action or enable motion inputs",
+          "V297 missing IMU, one servo and several servos retain Chinese identifiers and exact original startup errors"
+        ],
+        "source_sha256": {
+          "static/app.js": "f598acea30084b672c185e56d64a8802b9ba44abf47bc708008608ccb9223562",
+          "static/four-pages.js": "7ba9e2f73a6a242cfbb9c97069847005b65e8bddb28c67ac32465eb51bf7b737",
+          "static/four-pages.css": "dcb1a5f6d22378ab45da8484a256ac6519be5bcf7bdc18414c6f87f7820edb9f",
+          "static/numbering-position-stream.js": "a11e759333b833b5481850d768b238b81f05bf1098ede585b5bba46d533b9dfe"
+        },
+        "test_sha256": "500f42b2bd566c6cc12b2728ffe88dc2565dce69157bf8c4091cbb16fb7a370f",
+        "style_review": "A stable joint wrapper separates feedback/curve sizing from AI. Existing controlled tests cover navigation, request feedback and lifecycle; CSS is source-reviewed, with no browser pixels or computed geometry claimed.",
+        "boundary": "Actual shipped constructor registrations, action/scan/maintenance/stream eligibility methods and APP lifecycle callbacks run with controlled DOM/API/timers/observer factory. Ordinary focus/visibility perform no refresh or reader restart; existing periodic reads remain. Actual pagehide cleanup and explicit hardware/input blur safety paths remain separate. No browser-engine BFCache, real WS/SSE transport, SSH/UART, 3D pixels or hardware acceptance."
+      }
+    },
+    "hardware_tested": false,
+    "browser_pixels_tested": false,
+    "known_good_promoted": false
+  },
+  "source_review": {
+    "passed": true,
+    "reviewer": "primary agent source review",
+    "checks": [
+      "Only newly created service.sh/observer process group is signalled; systemd robotd is independent.",
+      "Owned waiter descendants are reaped before the management task completes and releases busy state.",
+      "Pending hardware is distinct from actual mode/process identity and from ready motion control.",
+      "Original stop/serial-release/owned-lease entry checks retained; no retries, HOME or Policy starts added.",
+      "Entire firmware and all protected baseline runtime bytes unchanged."
+    ]
+  },
+  "known_good": "Existing Reference Duck Known-Good retained; V297 test candidate is not physically accepted.",
+  "next_task": "实机确认缺 IMU、缺单颗舵机时测试与编号入口及时可用；用户确认后再发布仓库 Beta 版。",
+  "files": {
+    "AI-TEST-NOTES.md": "f8a2ebe0b76c30ca9fd83f042c51f642909d5990b30103f88dc7fed16399e862",
+    "DEPLOYMENT-IDENTITY.json": "d9a78c2828744f59c0004a911e0eb499c3b1eb154b593a8a7de73aef1d473df2",
+    "LICENSE-SCOPE.txt": "3df6312fd165a65e0bc2c72af920638b2cfc859bc9c5419dd8f72c6c4e993ade",
+    "Personal-NonCommercial.txt": "db7fdc259f134d942fb1b0d455797d7d14bf8058aad86221209f29b44b01e594",
+    "README.zh-CN.md": "3b0aa8a30da3eaa15df80774686e4404153ab5a5b062c21f8bb21200b1471b20",
+    "THIRD_PARTY_NOTICES.md": "8945cfec5bd7897a3c08484505f1ae363e6e0b8b92178276b52c11ec1f10d576",
+    "_ai_vendor/SOURCE.json": "15b0da76f612753569a6e1c06e18784be5ff47df056a213d1a20f701a4184362",
+    "_ai_vendor/__init__.py": "40f7aafe673cc6b350de16f23f3d9e54d87610081af4e6ef11e20669babef01e",
+    "_ai_vendor/websocket/__init__.py": "2370998a3790e51927e87c67c0ee9065d35e65bb981305c1381eb67bfcb9c69d",
+    "_ai_vendor/websocket/_abnf.py": "440e18a4f52a1618148d0662de71737a3418f2ab797e949108e4cd5558b8c4a2",
+    "_ai_vendor/websocket/_app.py": "a3ff4cf380c73f5e8f64f62d1e92ffcfa210f3e96931b0e39579b3a7234068fa",
+    "_ai_vendor/websocket/_cookiejar.py": "d156c66a48b69d97fea82fe2103c5afe157189dd843e6a9827770ac4f0ce591a",
+    "_ai_vendor/websocket/_core.py": "dd77678a0f3ba5adcbcffadcf4657ccc577e12844f84e8bfab7bad3667546377",
+    "_ai_vendor/websocket/_dispatcher.py": "1c733840e27db3a38ead1750c500f426e80ffc2f8ddf9d9a53023536a05c753b",
+    "_ai_vendor/websocket/_exceptions.py": "6af5b69235dedac81bcbe86c516fd0348b8c37a70cdd35dfded0669d26739e2b",
+    "_ai_vendor/websocket/_handshake.py": "592717f96c2d809048bfebf76031497625080db6926bd3dc01dd8b5e913334ae",
+    "_ai_vendor/websocket/_http.py": "689a4e94c61ccfa88f6f4dfa4dc2565830c89c539d2eb1161a41b0bf0d2ad7d4",
+    "_ai_vendor/websocket/_logging.py": "93b397367221dd475228d1dd656391e8f799de4d40653a53363832f049dcc29c",
+    "_ai_vendor/websocket/_socket.py": "9556708eba36a86c5ca039a425f71685a98b029b17caa4165fbffb0211de54a8",
+    "_ai_vendor/websocket/_ssl_compat.py": "8640bb3e243a6641fcd9ae839de3511c274aca936f4044ab21b812ee3dd1a96f",
+    "_ai_vendor/websocket/_url.py": "e1635822b5ac0d515a660827712baf055a99536111c0c5b7b73c81c8f129ec48",
+    "_ai_vendor/websocket/_utils.py": "43a127dc3ab201cb4a37903c0d96ff4ba014ade7274a31ff92a0a3dd55de7532",
+    "_ai_vendor/websocket/_wsdump.py": "9d77f6987eec5471e13425b4cf5836c3efbbfd62ec77c9270fd956372322e3ec",
+    "_ai_vendor/websocket/py.typed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "agent.py": "55ed4162ae5ce7d2dca3be89632805158b8b4a4b383cfa3f730936279b259c50",
+    "ai_action_gate.py": "1a38a6debe5769b7add2b00a1da553968699115c42398e782ddf62144f04948d",
+    "ai_audio_meter.py": "531f865eae05396fc98b5cefaa294a93dcccd49b7aaa2154377f6d3d82079ddd",
+    "ai_camera_setup.py": "8511608f07188d789bcdbe7df1c6da655a1f7a56e0eabfa0bd4b951997b2b197",
+    "ai_channel.py": "0fc175f48e4f40b2eee8484fd601e5c48e4568a86927e61aa358b38e6760d106",
+    "ai_conversation.py": "96eefbb101b5821c0f2b51420bfd80d315b74b3bbc52f236efe724a0eb6a1c96",
+    "ai_doubao.py": "f7395fec428faad0395adf5c3acf733a782c20b66561c5d6dbf7a2ffbc33c29d",
+    "ai_hat_audio.py": "acce67267ef7f6d15d0112bcb4b8775e5e25f990c4f2ca8fcd8d8a1d6c324fd3",
+    "ai_input_lease.py": "e2632ee7ec70598d3a90bead0ed744674e2603218955cb29c9dfe105662d4735",
+    "ai_mouth_lease.py": "f592b23bc599acc2670d0894ac91c984dd0cd52a1535f3ff1492ca950a0f4d74",
+    "ai_pcm.py": "93f371f816d13808d1ea9a74b93925f87bf70c0c4064da2c8d6cef0bed33f6b8",
+    "ai_persona.py": "35fb4a654ecbe83304eb504a53952ec76dc8525333e2c28e61c33c1013a1c6af",
+    "ai_preferences.py": "67f210173de8e2b8477b3ad45854f905ee2c3bb8ed48ce6efbc84f700dec86fe",
+    "ai_remote.py": "1924fcdbca4e144f99895caf9f6bfef654d28093516171416e2d67dfb2170148",
+    "ai_runtime.py": "06b2e69f25ca109d78e751bd30af00d8d18a6b4df4d45979e5ac8c2ba08c1359",
+    "ai_tof.py": "144e67b9b19e803af20c8bdb6d2fd78c01aabfeca039605c9f7f96b2a3dcdfb2",
+    "ai_vision.py": "d1c28e8a1262b30f65f8ec0850160797c668891f7fd47b31623444165919f425",
+    "ai_voices.py": "cf9cc14952a8c71b5059ffaa7b484ebbf3a54533bb25f34ada76c1e3c22eb8e2",
+    "ai_zero.py": "e86056f107db20ca5afb657ffc37dd82e2e9538225f40807c0075f79314d88dd",
+    "board_audio.py": "dd2b7298c57f30ebfb9ad50945b3a49e3e41d5dc569fd79482686065a7e93419",
+    "chorale_setup.py": "86030ddd4b8a6eb0f7f57600cdc7d5b5b14cbd0e4ac75adba769413cc47b71cc",
+    "connection.py": "1501ce815157fa8d989496e830af1bd0909225b5747ac7400f1c4a0ab1588f4b",
+    "connection_retry.py": "9112628fd1bc959c42e6690c30cabb09cca1cf78d575ff19f98a523ef91a5d00",
+    "console.py": "c8a330a0dac1ccc63b8fc234c6395307a819687237418f78cfcda9dfa96e159b",
+    "control_socket.py": "58acdde124f05b9c126061333609b78b6d67cb1e920cdfe927ffd42e7ea3be6a",
+    "controls.py": "ff7ae2e7c7700fb0d23592131338103689d79ce4215aa91e56bd058a234a345c",
+    "docs/UPDATE-V297.zh-CN.md": "76b0eaf48101b9a73d8eeb7a75533e7ce4cea2d8d1acebabe38061c866f6d591",
+    "docs/joint-scale-design148.md": "af4e81c5ad4772e22c9a1321e1ad2b9d3d1c033e25fc8cc25c3ede140868a474",
+    "firmware_packages.py": "91d03901c0bf900e9d9927f351cb80c584bd49d1bab2d11a119b206281d51a56",
+    "gamepad_repair.py": "1624a5870086d2c859e75402b19921c3056f3418cea288fe76ca30488290792d",
+    "hotspot_control.py": "3677eeecf0606c31eae8e5b7d81741dfdb41a034b8b480c5c43c82a3b4771bae",
+    "input_channel.py": "9ede66730f610bfa0d8c3e669dd847ed944605f2b13e63e63d99b16d865375d2",
+    "install_handoff.py": "7ef8504124e16e80424caf2720567e15052217dc54fbbc650b7f78c54a9ae0c4",
+    "licenses/MICRODUCK-APACHE-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "licenses/MODEL-NOTICE.md": "dc84832b859e6d71e33bc5f1e268825c9daf2963146997d9ada0dee03f38a8cd",
+    "licenses/THREE-MIT.txt": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+    "licenses/WEBSOCKET-CLIENT-LICENSE.txt": "d7ad8d0966aa363d45c7b16b0838cadcd51676acdf215ad967307d581b47872c",
+    "maintenance_components.py": "5c306e1bf050656845ec229d22143dd0b89d7ddd478ea5fd7f1164fa2f672bf5",
+    "maintenance_control.py": "777fc5fb235951560506e0dcc1aa4f8e7aede8ff6cdf970207560e5b89c9cefc",
+    "maintenance_events.py": "ba60b724863387a69f11f17c050c097a8514e2dbb34dcc565ea319a5709e3528",
+    "maintenance_positions.py": "63ae4df3477018a6da93a3ddfe8ea9207e4893b6237664317e802ed5460a9812",
+    "maintenance_worker.py": "9ff58fd7e4dabfd0b9fed4cae4bda2cd1335f54bf33bf07889034e490eb0f8f6",
+    "manage_stdin.py": "2ceda143143757786c64508e3eb656b2cf2e060e4b590aee15d69731b1da25cc",
+    "management-profile.json": "6b168ed3ad6a9252a2c21a2259f2854fb23ad7a46569e35fa1a411be46eb0dd7",
+    "management_profile.py": "034f23e7aa24c99afc635f129ab6bd07507ce7b1a9e50e3120b13f9ed227a049",
+    "manual_robotd_stop.py": "9ab9a4b41397bf673332a1fbf88f1e4fa216c8c4b0b78043203e3a19092f2243",
+    "mode_switch_observer.py": "0182985aa6aa46b5a09e1e23cc5d1d2e11821053a5acf508d0cd0f248302881b",
+    "power_control.py": "644b68199dd3088172f9a9b05b15ebf4fabc34c48e90a4939e32abb83be5ec7f",
+    "process_lifecycle.py": "b119a424225ec46ddd3f82be18f059991920ae88fe35c814920999b1cfbce2fd",
+    "raw_telemetry.py": "4a481a57d951b6092b6583c7096ec35d52c0755650466290969f29ff33df7be9",
+    "release_identity.py": "338f5e376e279cd00e9f000adb88f31d841911d2e19d388054d455fca5f20de9",
+    "remote_audio.py": "3548defac19ba7155bb95e3bddc6c9f37bc84ea2deacb0f1cd8749636ca453d9",
+    "remote_input.py": "ad6d99597af94e7003b292c5551032776075d5dcf1a4712fe9ef41848bd61d1e",
+    "resources/wifi-r5/SOURCE.json": "c3bba7301de9aaccd86c23dd5683709a89948ed6deb015a4c5afd8b57578833b",
+    "resources/wifi-r5/microduck-public-image.sh": "71fef0e3c179e6a39f04029dbbe937515a8c446918763e1d6fc33910bf0bc0c7",
+    "resources/wifi-r5/microduck_wifi_r7.py": "3b23f4224af343b88e92410ca6bd4bcbc10165bfadf626cd5e445379b67db191",
+    "service_channel.py": "c78b233053229e689f108b8190bb1da70f473a2fb3e248e346fcb2460894b248",
+    "service_control.py": "1da62e7d3c9d6e4a5e5b141a30591c0fbe68dfed6ce8cb2ff29c6bcb2bae1513",
+    "service_data.py": "ad93556ac26fd0829865fcbec03811e82003a1a9626dbca100f13c2e02a2b133",
+    "service_rpc.py": "a7f494fb467b82f6b1ff7fd0b4490153b68a3afed16589adf670b925bf393804",
+    "session_sequences.py": "4d5e28826c02354d8f39203600970e6a6bec54d7baf81ad59297f977b2578d0b",
+    "socket_transport.py": "b993fbee01beaea7d6e83d58d101623df856e7a3e1c6b6a929341bbd767c6777",
+    "ssh-askpass": "2fe5c8e54a918a3aa443a185297c322f46ca5ad7818e005761abb8e19f02a8c2",
+    "ssh-askpass.exe": "c9cc7e529702a45c32c4ce2ccf424edcb4dc8e41ba6ab3d25db6a5beb7671eef",
+    "ssh_connect.py": "40ef3eeef4220246b6b52ead3fa2caac5295c7ccad71be2cba1addd681370068",
+    "staging_upload.py": "91e318a105cd3946834129239332e76ba65babd88536e24d6b70d1f461ff9a0d",
+    "start.cmd": "c3ed909e52c9b1a5e24e44686d4ba995a353cb48d9d6d91d1f2852017a36ae4c",
+    "start.command": "32d76f1ce0e94fb579f54caa8c20d4f5e24a4dba16b9a991f3e3a414ffedd9e9",
+    "startup_diagnostic.py": "c4649b495aec8411d5c2a51cd874aba74e56010a551f824327a97d14f1bae2ec",
+    "startup_gate.py": "9b1a07b55f36d8cc93b0a99d1776396f455e5f91f890a91112d8b04d18e48557",
+    "static/advanced-parameters.css": "e5e7584154ad826b9389df43f5a093d6701124e3f0dd7242bc0a289a0fe2333f",
+    "static/advanced-parameters.js": "3f38e52a5191bd8e42f4e3361fa66175e02563303d90bcb3e58a30efaa9aeab3",
+    "static/ai-camera.js": "9e8ab9898813284d2c7d58ed98f914ec42147a208ae89ca012f72168b9da7bfc",
+    "static/ai-panel.css": "d80ccf42678f06bf591f41fc113367fd0a2454bd1ebabab994bf2f28d1e6a6b1",
+    "static/ai-panel.js": "bc8512e32f2d729ef34d239f0054d72ad1394fb42a12c14da6fccc483bb0503e",
+    "static/app.js": "f598acea30084b672c185e56d64a8802b9ba44abf47bc708008608ccb9223562",
+    "static/assets/asset-sources.json": "83dbaa5c6f0abbb32f774548503a26c2bfba012327877bb79c3b4cd14d6f8333",
+    "static/assets/duck-visual.bin": "2051b738abb89cc672923ee9ae4705354e0760ba90238398eb402ba453b06d98",
+    "static/assets/duck-visual.json": "8922b98bb9ba3c99bc18f936a42abdbfe87cc045d18200e5948c99ee841f573f",
+    "static/assets/gamepad-real.png": "2d6c1971e18b29d2b90132786f4c14bc6c496bcf3e378db52ad1f6d3d932f165",
+    "static/assets/tutorials/battery-power.jpg": "85772c8e1c95528d8453ce553a2cba4c4f478409364ffe6d5c16680ac8ab8cbd",
+    "static/assets/tutorials/hardware-wiring-white-v268.png": "1854fdfe0e03da6bce4e7fe4a3ee133f893bbe4271cdcbf6ba27b46c67c1f2dd",
+    "static/assets/tutorials/hat-speaker-wiring.jpg": "b77bf1c0e450af101b83ad3105f204594aa4b267b5f060fb8c129f2d468427cc",
+    "static/assets/tutorials/hat-zero-wiring.jpg": "5cadb846a081a63446e2b4b653f69ba132571373fc7c9ecc02fc5512292c2a63",
+    "static/assets/tutorials/hub-harness.jpg": "08d1b56f46ff0d9a79907fb99f0721dbabb99ca49ad109739eb5ca33e3f2f544",
+    "static/assets/tutorials/hub-imu-wiring.jpg": "2b6cb7b5ea352181f6158642c98ea24499bcfa37d9b302467997300591d72139",
+    "static/assets/tutorials/imu-installed.jpg": "63f68577982b0abeaab1a7fb2e1c3ec5619c6bffccd5c00eb66337f06a6e4b56",
+    "static/assets/tutorials/numbering-wiring-white-v268.png": "d30c6d2f4d553f137c2ce91d7a29de4be971d308059e5f63153a4d16da523cfc",
+    "static/assets/tutorials/robot-ready.jpg": "6054c452e5ce9286b1d11e1c8bc480ccec95c8dcd5fbf30b4f3d0496d2dd9b8e",
+    "static/audio-level.js": "a5e59d0be04bd0f77ab03f71557125a09fc3f6a3c04dc917d71e686cb11cdde4",
+    "static/calibration-reference.js": "ee256295e0ef8580a278e2f91366c5819a1dca5e2cfb5c57ab1deb79e86dc8e1",
+    "static/calibration-view.css": "9430a5604633f1241c44ee30df8be0c09ca26f2c3c9ef44a690f845d26b7dbcf",
+    "static/calibration-view.js": "acd3e179ae0176adc495ffc9d0658fee16b41f74487144d82459f13beff6460d",
+    "static/camera.js": "0a2c17a5cf72ab77a98600f3a2adc489880f906e14bcb9fb0ed00cfffc9f6bff",
+    "static/center-confirmation.js": "06706e523cb403994d7d541a646e5bf5d85402995e219e38c248d647ef3599e5",
+    "static/chorale.js": "4535d70d2f194a8ab994929b5eba05b39953349d2c333c55d087bb31bda0095d",
+    "static/connection-retry.js": "2f3cc7ef2e3588e6d4995cb819eec552d4dfd70e1d69d077f12647d516acec10",
+    "static/connection.js": "e4b400aa32e72f2fd27f44b09744d8804b72c8e0c508e9b2dcdf7c51e8bab766",
+    "static/control-session.js": "c3df576781d090bdfbd7173a692e31b16a553034343ea4b54a1ac4e381a55013",
+    "static/control-socket.js": "1dabafe8b6a114738c201bfa66560aee4c40e6fc06414569b1f39992a42774c7",
+    "static/control.css": "833f1818e09a71de45ab460c3dbf973ed14612210ca65aa96c3808d0a0a07045",
+    "static/control.js": "9572e0e2d46280a1bbb988511ad834eb79f6830fe9cc74b2997f35cb9e70895a",
+    "static/diagnostic-export.js": "3dc7382b1f94dcab6dcc0e2ecfca02ad68d5fa303bb0771688c0e091d2042be8",
+    "static/dialogs.css": "152855791912b6d5ca310edf34de705892e38f83c35dfd5c43b08af4a1ae71b1",
+    "static/dialogs.js": "63b6740ec7e40b974fa5539ce85700e1c60535bb67161e9209e75f2675565c36",
+    "static/duck.js": "f8a3a8c3a12f18a004298b0d72debdce01270aa378123a0c9c5e907240c15d44",
+    "static/execution-profile.js": "c642723837b179124e4feea1ac9d98a6ac656f20c6010b2a280012d9fea93430",
+    "static/feedback.js": "c6f3b19ebfc77ebc9739b32efcff512c3f18cbb7842dceab51c92510fb8a9c8a",
+    "static/firmware.js": "42da1549d6b82476f4445e686143d935a51df62d26e681d0a6ff924db45be2e7",
+    "static/four-pages.css": "dcb1a5f6d22378ab45da8484a256ac6519be5bcf7bdc18414c6f87f7820edb9f",
+    "static/four-pages.js": "7ba9e2f73a6a242cfbb9c97069847005b65e8bddb28c67ac32465eb51bf7b737",
+    "static/gamepad-repair.js": "7b49ba75dd1e4ceee25c47d623da28bca8a48a41df7627f93ebcbf138f78c265",
+    "static/history-frame.js": "f018df0aacc8e3b6c06f4383cc778cc7d69eef3619fa150c933c718d6b7af403",
+    "static/index.html": "7a858ce6ff308cf863cc1b8aa3a94c5cf66c6822349fcea542efbfb1db659a3d",
+    "static/inspection.js": "ad13c576fafa59a873ba584ad7181cdb75b597395f177845d9c24147fce9f30e",
+    "static/joint-direction.js": "b15321bec9be02d1c52c9d7db98d0ec774543687d5c53abfbc5098fb1882ca29",
+    "static/joint-map.js": "5a4c1bc0142424a0fe277eba9a508485af3ff89e83ac823b3bd899baa432b812",
+    "static/joint-reference.js": "3c8247b750ad21b9f885f5d7c5e489effd0a142db7719d07208966be530bc664",
+    "static/maintenance-imu-stream.js": "9976dec3b06a3057ab6dd3ad18dd21377ae5e3cab2113fbd821eb2d67713fb2d",
+    "static/messages.js": "df55f468576dbf414131ecf16304ad4101e0f1b9be581c2e876880df7ef286ac",
+    "static/metrics.js": "25eca8d616ade7426ce44f097c39ef960c8bbec8abaa7f6895152d61f15960f8",
+    "static/numbering-position-stream.js": "a11e759333b833b5481850d768b238b81f05bf1098ede585b5bba46d533b9dfe",
+    "static/pose-state.js": "3fb0c157d1ac98b00aef03da043a0dafb0a2e2b5321c67a4e6f4e0212df4a7fc",
+    "static/pose.js": "08d1f72f0a5429d99a193b0798c0fc4163a5cc2e00704985668de8acbd5eea84",
+    "static/r17-0151.css": "b1ec027ae6dbb9eeda48dd6af66a4f567ec698717c710e268fd7a197daa9b0a7",
+    "static/raw-kinematics.js": "814dc7401c3dfe76b815a721a73c57f7da9adecd4ebc787da8d3190ef90288a4",
+    "static/raw-telemetry.js": "305dcbd140c2e68523bd96b06b9a81480daf62065dfab65a4cf334d79b1bf01f",
+    "static/read-timing.js": "1715622067bb01b614608d95f88e71421c734c3c359956d589e95c596f03b6c6",
+    "static/responsive.css": "78400c6ff8c585140305b3377ecf59b07619a29bafc65d6693e534014ff7f06a",
+    "static/service-builds.js": "def3aeb0187ff3f49769e257e411702c6b4e1b8dcfe8987f9185240947b57e5c",
+    "static/service-management.js": "2ff8bc9471dd68e66bb8183fa3df5bda424c8629007397a605c6f30519d1e725",
+    "static/service.css": "32e3542b160b1d143d0322e951bc9ea14593988ce4a4d036ee085a94ace481c6",
+    "static/service.js": "bb6b46d5094192c0b6cfe8a6df2f666a1695138de564b642dd6fbc5936715bcd",
+    "static/startup-status.js": "ce08fbdc98d7f4be602916978429d794eca07248e8549a26b0303c002574bf5c",
+    "static/styles.css": "4727afdbe85d6b501be3a0a3ba975ba203e6c017aae64fe385a823dca334a200",
+    "static/system-log.js": "d1d44f0f9aab1dfc6e4f28d9c766881bed09996dea5db0c922c3434245a6ad6f",
+    "static/vendor/OrbitControls.js": "c49106c5bd6b6f75b850ca54aa46a29154c929ce5de6cde6df96057d6edc8b21",
+    "static/vendor/three.core.min.js": "61ba0df005b05991361d040d8ff670e1aadfd0ce7aeebd1fdb0725957a8957de",
+    "static/vendor/three.module.min.js": "e2b5ee6bccd38fd6d8a2428546b83c5f2426d84b152ef82be8055556e3b40eb6",
+    "static/webpad-controls.js": "e25bc38fbacf3a9f258a406fb1d0f7d6e1edf35a298f9d303e256a1b054eed47",
+    "static/wifi-panel.css": "6cd3bca0aee70762da127a197e142acb35ca316ef808b88eb50a3d1eaff71c07",
+    "static/wifi-panel.js": "5550d7ac69e590822c1328983d23d887aeb0821609f8e1f01669e3e2f063405c",
+    "sudo_credential.py": "b05e9d1803f8d1acef40aaf5b856aebdc84c8c55f4c6bc1e19c61811595ab105",
+    "system_log.py": "dd96afec02bb16f5ded5d99d9c9bdfbf841a2bd6dc0f8a409cc807b7898153bb",
+    "telemetry.py": "a570da9e37c346bbdc9aca763be130ce4a71e72e74f83aead7d4134a570dec89",
+    "updates/Microduck-Robotd-FT6-R17.tar.gz": "18cecba4840e70c273c8fc5534cf5bd3e8386666f67b794c954d4ce3d0b74776",
+    "updates/imu_to_feetech_ReVA_FT6_SYNC15_UART_IRQ_v1.bin": "d7bd2f37a6a4e0e15d1f9650a3959bcf4d8c704524d8ec319d72d8bdf104ab6d",
+    "verification/v297/lifecycle-results.json": "bad656075828fa4e50e0f27739b5d08d0753672350fa6e03cd361c5ee2b204cb",
+    "verification/v297/lifecycle-tests.mjs": "500f42b2bd566c6cc12b2728ffe88dc2565dce69157bf8c4091cbb16fb7a370f",
+    "verification/v297/mode-switch-results.json": "3b1c133766c5bed65f1f4105c01d310111f32a220e633ba53c8a576aeaf98767",
+    "verification/v297/mode-switch-tests.py": "a74122b4b74ed693e422baade45b7288f686ab5f8700689a23f40113bd741050",
+    "verification/v297/release.py": "f83da325f1b860fe7a87318720699cd75d1806ebd376f709c1563a2990b5a152",
+    "voice_preferences.py": "d6ce960abafb21dc9cc2406df4659797ff842fb2ff67f8cf8d5929cbb1367b14",
+    "wifi_client.py": "8e9945a8b4845c639df03e123f5be66c42054576b0ec35aef1d1cba69c7a3b24",
+    "wifi_manager.py": "af774413eb8f9855f7667b507dd92deb4f4424628e94dcc9c386e9d8c97e6537",
+    "workspace_control.py": "6bad135155d41a6fe83551765203c24813cfc349b2c9352f63133f3eeeab6399",
+    "workspace_policy.py": "d58d607cbc0949cf6db3d6a2fe44de5e2a3ab358185d786072e23467eff9e1f1"
+  }
+}

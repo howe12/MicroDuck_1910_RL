@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "cases": [
+    "ordinary focus and hide/show keep actual constructor state, drafts, DOM and existing position reader without requests or card writes",
+    "existing normal maintenance poll continues after focus without an additional loop or configuration refresh",
+    "hidden legitimate swap and IMU observations retain their actual reader eligibility while new hidden writes remain guarded",
+    "real failed position and IMU readers stay latched through ordinary focus and visibility changes without reconnects",
+    "actual pagehide keeps displayed state and drafts but invalidates freshness, and real pageshow restores one read loop without reentering or scanning",
+    "a pageshow on an already running page performs no maintenance refresh or view reset",
+    "actual APP registrations do not refresh config or recreate a healthy observer on ordinary focus visibility or initial pageshow",
+    "actual APP restores only its own unloaded cached-page observer once, and never retries a genuinely failed observer",
+    "a genuine cached-page restore initially hidden completes only its own paused observation when visible, without touching healthy or failed readers",
+    "actual scan click ACK progress and completion leave all four mode-card DOM attributes and copy unchanged",
+    "real accepted mode transitions update navigation while local center and swap locks remain enforced only at action dispatch",
+    "real switch failure unlocks all mode cards and displays one readable internal dialog without retrying or replacing the selected servo",
+    "uncalibrated motion click already in calibration displays one Chinese internal error after the real unchanged API reply instead of clearing it",
+    "a fallback that must start calibration explains the original motion rejection without claiming success or submitting a second operation",
+    "a pre-V294 backend target-only redirect still produces a readable rejection",
+    "already selected numbering explains why motion was not entered without a scan, native request or page reload",
+    "entering numbering as the prerequisite keeps one explicit entry and one rejection of the original motion click",
+    "valid new motion entry and opening an already running motion page remain successful without spurious calibration errors",
+    "V297 completed management with explicit IMU wait unlocks real menu dispatch into both bench modes without waiting for hardware readiness",
+    "V297 no ready feedback does not bypass an actually running service action or enable motion inputs",
+    "V297 missing IMU, one servo and several servos retain Chinese identifiers and exact original startup errors"
+  ],
+  "source_sha256": {
+    "static/app.js": "f598acea30084b672c185e56d64a8802b9ba44abf47bc708008608ccb9223562",
+    "static/four-pages.js": "7ba9e2f73a6a242cfbb9c97069847005b65e8bddb28c67ac32465eb51bf7b737",
+    "static/four-pages.css": "dcb1a5f6d22378ab45da8484a256ac6519be5bcf7bdc18414c6f87f7820edb9f",
+    "static/numbering-position-stream.js": "a11e759333b833b5481850d768b238b81f05bf1098ede585b5bba46d533b9dfe"
+  },
+  "test_sha256": "500f42b2bd566c6cc12b2728ffe88dc2565dce69157bf8c4091cbb16fb7a370f",
+  "style_review": "A stable joint wrapper separates feedback/curve sizing from AI. Existing controlled tests cover navigation, request feedback and lifecycle; CSS is source-reviewed, with no browser pixels or computed geometry claimed.",
+  "boundary": "Actual shipped constructor registrations, action/scan/maintenance/stream eligibility methods and APP lifecycle callbacks run with controlled DOM/API/timers/observer factory. Ordinary focus/visibility perform no refresh or reader restart; existing periodic reads remain. Actual pagehide cleanup and explicit hardware/input blur safety paths remain separate. No browser-engine BFCache, real WS/SSE transport, SSH/UART, 3D pixels or hardware acceptance."
+}
