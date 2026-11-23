@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Continuously record a running Microduck console for stop/stall diagnosis.
 
-It polls the console's local /api/recording endpoint, appends every new frame
+It polls the console's local /api/snapshot endpoint, appends every new frame
 to telemetry.jsonl, emits simple event markers (gaps, stale channels, joint
 error, current, temperature), and writes a summary on exit.
 
@@ -22,7 +22,7 @@ import urllib.error
 import urllib.request
 from datetime import datetime
 
-DEFAULT_URL = "http://127.0.0.1:8090/api/recording"
+DEFAULT_URL = "http://127.0.0.1:8090/api/snapshot"
 
 
 def now_iso() -> str:
@@ -146,8 +146,13 @@ def main() -> int:
                 time.sleep(max(0.5, args.interval))
                 continue
 
-            frames = data.get("frames") or []
-            if not isinstance(frames, list):
+            if isinstance(data, dict) and isinstance(data.get("frames"), list):
+                # Compatibility with older /api/recording responses.
+                frames = data.get("frames") or []
+            elif isinstance(data, dict) and ("at" in data or "servos" in data):
+                # /api/snapshot returns one live frame.
+                frames = [data]
+            else:
                 frames = []
             new_frames = []
             for frame in frames:

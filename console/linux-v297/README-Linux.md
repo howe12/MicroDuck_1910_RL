@@ -166,7 +166,7 @@ licenses/              第三方许可
 ## 9. 停住 / 卡死诊断
 
 中控本身有实时曲线、日志和约 120 秒录制，但“走几步突然停住”最好持续落盘。  
-`tools/duck-monitor.sh` 会轮询中控的 `/api/recording`，把每一帧写到 JSONL，并自动标记异常。
+`tools/duck-monitor.sh` 会轮询中控的 `/api/snapshot`（实时帧），把每一帧写到 JSONL，并自动标记异常。
 
 启动中控并连接机器人后，另开一个终端：
 
