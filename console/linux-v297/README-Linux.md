@@ -196,6 +196,7 @@ python3 tools/duck_monitor.py --interval 0.5
 |---|---|
 | `channel_not_live` | robotd / 总线 / IMU / SSH 数据断了 |
 | `no_new_frames` | 中控收不到新帧，控制循环可能停了 |
+| `target_out_of_range` | 目标角超过标定限位，通常是策略/映射/回零问题 |
 | `joint_error` | 某个关节跟随误差 > 15°，机械卡住/舵机没力 |
 | `high_current` | 电流 > 1500 mA，堵转/卡死/负载过大 |
 | `high_temperature` | 舵机 > 70°C，热保护风险 |

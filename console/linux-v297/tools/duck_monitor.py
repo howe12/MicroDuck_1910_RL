@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import pathlib
 import signal
@@ -53,12 +54,32 @@ def metrics(frame: dict) -> dict:
     health = frame.get("health") or {}
     battery = health.get("battery") if isinstance(health.get("battery"), dict) else {}
     motors = health.get("motors") if isinstance(health.get("motors"), dict) else {}
+    calibration = frame.get("calibration") or {}
+    calibrations = (calibration.get("calibration") or {}).get("joints") if isinstance(calibration.get("calibration"), dict) else None
+    limits = {}
+    for row in calibrations or []:
+        if isinstance(row, dict) and isinstance(row.get("name"), str):
+            lo, hi = number(row.get("min_rad")), number(row.get("max_rad"))
+            if lo is not None and hi is not None:
+                limits[row["name"]] = (math.degrees(lo), math.degrees(hi))
+    violations = []
+    for servo in servos:
+        if not isinstance(servo, dict):
+            continue
+        name, target = servo.get("name"), number(servo.get("target_deg"))
+        if target is None or name not in limits:
+            continue
+        lo, hi = limits[name]
+        if target < lo - 1 or target > hi + 1:
+            violations.append((name, round(target, 1), round(lo, 1), round(hi, 1)))
     return {
         "max_error_deg": max(errors) if errors else None,
         "max_current_ma": max(currents) if currents else None,
         "max_temp_c": max(temps) if temps else number(motors.get("max_c")),
         "battery_v": number(battery.get("volts")),
         "bad_channels": bad,
+        "bad_details": [f"{n}: {str((channels.get(n) or {}).get('error','')[:120])}" for n in bad],
+        "target_violations": violations,
         "servo_count": len(servos),
     }
 
@@ -142,14 +163,19 @@ def main() -> int:
                 if m["bad_channels"]:
                     bad = set(m["bad_channels"])
                     if bad != last_bad:
-                        emit_event("channel_not_live", "通道未就绪: " + ", ".join(sorted(bad)),
-                                   channels=sorted(bad))
+                        detail = "; ".join(m.get("bad_details") or [])
+                        emit_event("channel_not_live", "通道未就绪: " + ", ".join(sorted(bad)) + ((" · " + detail) if detail else ""),
+                                   channels=sorted(bad), errors=detail)
                     last_bad = bad
                 else:
                     last_bad = set()
                 if m["max_error_deg"] is not None and m["max_error_deg"] > 15:
                     emit_event("joint_error", f"最大关节误差 {m['max_error_deg']:.1f}°",
                                max_error_deg=m["max_error_deg"])
+                if m.get("target_violations"):
+                    text = ", ".join(f"{n} {t}° (限 {lo}..{hi}°)" for n, t, lo, hi in m["target_violations"])
+                    emit_event("target_out_of_range", "目标超出关节限位: " + text,
+                               violations=m["target_violations"])
                 if m["max_current_ma"] is not None and m["max_current_ma"] > 1500:
                     emit_event("high_current", f"最大电流 {m['max_current_ma']:.0f} mA",
                                max_current_ma=m["max_current_ma"])
