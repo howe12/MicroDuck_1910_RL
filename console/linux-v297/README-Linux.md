@@ -162,3 +162,57 @@ licenses/              第三方许可
 
 原项目原创部分为个人学习、研究、非商业使用；商业使用需作者书面授权。  
 本封装不改变原许可，也不授予额外商业权利。
+
+## 9. 停住 / 卡死诊断
+
+中控本身有实时曲线、日志和约 120 秒录制，但“走几步突然停住”最好持续落盘。  
+`tools/duck-monitor.sh` 会轮询中控的 `/api/recording`，把每一帧写到 JSONL，并自动标记异常。
+
+启动中控并连接机器人后，另开一个终端：
+
+```bash
+cd Microduck-Console-Linux-V297-BETA
+./tools/duck-monitor.sh
+```
+
+或：
+
+```bash
+python3 tools/duck_monitor.py --interval 0.5
+```
+
+输出目录：
+
+```text
+~/.local/share/MicroduckConsole/monitor/<时间戳>/
+├── telemetry.jsonl   每一帧关节、IMU、总线、健康数据
+├── events.jsonl      异常事件
+└── summary.json      本次监控汇总
+```
+
+事件含义：
+
+| 事件 | 可能原因 |
+|---|---|
+| `channel_not_live` | robotd / 总线 / IMU / SSH 数据断了 |
+| `no_new_frames` | 中控收不到新帧，控制循环可能停了 |
+| `joint_error` | 某个关节跟随误差 > 15°，机械卡住/舵机没力 |
+| `high_current` | 电流 > 1500 mA，堵转/卡死/负载过大 |
+| `high_temperature` | 舵机 > 70°C，热保护风险 |
+| `low_battery` | 电池 < 6.8 V，走几步掉压 |
+
+复现“走几步停住”后按 `Ctrl+C`，先看：
+
+```bash
+cat ~/.local/share/MicroduckConsole/monitor/<时间戳>/summary.json
+cat ~/.local/share/MicroduckConsole/monitor/<时间戳>/events.jsonl
+```
+
+同时在中控里点一次 **导出诊断**，并把以下命令的输出保存：
+
+```bash
+robotctl logs robotd > /tmp/robotd.log
+journalctl -u robotd -b --no-pager > /tmp/robotd-journal.log
+```
+
+> 监控工具只读，不会发运动命令。

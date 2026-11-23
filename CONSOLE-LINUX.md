@@ -24,7 +24,8 @@ console/linux-v297/        Linux 中控完整运行目录
 1. `service_channel.py` 的 Python 3.12 专属 f-string 改为 Python 3.11 兼容写法；
 2. `start.sh` 自动选择 Python 3.11/3.12，并检查 `tomllib`、`ssh`；
 3. 自动给 `ssh-askpass` 增加执行权限；
-4. 增加 Linux 桌面安装脚本和 `README-Linux.md`。
+4. 增加 Linux 桌面安装脚本和 `README-Linux.md`；
+5. 增加 `tools/duck_monitor.py` 持续诊断记录器（关节误差、电流、温度、掉帧、通道断开）。
 
 ## 运行
 
