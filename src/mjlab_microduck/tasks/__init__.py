@@ -6,6 +6,8 @@ from mjlab_microduck.train_hook import maybe_submit_to_hf_jobs
 # train_hook.py). A no-op without the flag.
 maybe_submit_to_hf_jobs()
 
+import dataclasses
+
 from mjlab.tasks.registry import register_mjlab_task
 from mjlab.tasks.velocity.rl import VelocityOnPolicyRunner
 
@@ -31,6 +33,10 @@ from .microduck_velocity_hd1910_env_cfg import (
     make_microduck_velocity_hd1910_env_cfg,
     MicroduckHd1910RlCfg,
 )
+from .microduck_harsh_hd1910_env_cfg import (
+    make_microduck_velstand_harsh_hd1910_env_cfg,
+)
+from .microduck_tricks_hd1910_env_cfg import MicroduckVelStandHd1910RlCfg as _HarshRlCfg
 from .microduck_skills_hd1910_env_cfg import (
     make_microduck_ball_kick_hd1910_env_cfg,
     make_microduck_ground_pick_hd1910_env_cfg,
@@ -136,6 +142,15 @@ register_mjlab_task(
     env_cfg=make_microduck_velocity_slope_hd1910_env_cfg(),
     play_env_cfg=make_microduck_velocity_slope_hd1910_env_cfg(play=True),
     rl_cfg=MicroduckHd1910SlopeRlCfg,
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+register_mjlab_task(
+    task_id="Mjlab-VelStand-Harsh-MicroDuck-HD1910",
+    env_cfg=make_microduck_velstand_harsh_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_velstand_harsh_hd1910_env_cfg(play=True),
+    rl_cfg=dataclasses.replace(_HarshRlCfg, experiment_name="velstand_harsh_hd1910",
+                               run_name="velstand_harsh_hd1910"),
     runner_cls=MicroduckOnPolicyRunner,
 )
 
