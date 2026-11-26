@@ -83,7 +83,7 @@
     <!-- Link trunk_base -->
     <body name="trunk_base" pos="0 0 0.12" quat="1 0 0 0" childclass="microduck">
       <freejoint name="trunk_base_freejoint"/>
-      <inertial pos="-0.0226332 -2.70828e-05 0.00280064" mass="0.19912" fullinertia="0.000123910282 0.00014585482 0.000115290784 7.16135964e-08 -2.06806985e-05 1.32359869e-07"/>
+      <inertial pos="-0.0226332 -2.70828e-05 0.00280064" mass="0.21212" fullinertia="0.000132000045 0.000155377282 0.000122817804 7.62890521e-08 -2.20308847e-05 1.41001282e-07"/>
       <!-- Part seeed_bearing__configuration__22x16x4 -->
       <geom type="mesh" class="visual" pos="0.006 0.0175 -0.005" quat="1 -0 -0 0" mesh="seeed_bearing__configuration__22x16x4" material="seeed_bearing__configuration__22x16x4_material"/>
       <!-- Part right_shell -->
