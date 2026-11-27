@@ -30,7 +30,11 @@ from __future__ import annotations
 import dataclasses
 
 from mjlab.envs import ManagerBasedRlEnvCfg
+from mjlab.managers.curriculum_manager import CurriculumTermCfg
+from mjlab.managers.event_manager import EventTermCfg
 from mjlab.utils.spec_config import CollisionCfg
+
+from mjlab_microduck.tasks import mdp as microduck_mdp
 
 from mjlab_microduck.tasks.microduck_tricks_hd1910_env_cfg import (
     make_microduck_velstand_hd1910_env_cfg,
@@ -73,4 +77,32 @@ def make_microduck_velstand_harsh_hd1910_env_cfg(
             solimp=GROUND_SOLIMP,
         ),
     )
+    return cfg
+
+
+# Head-plant recovery curriculum. Observed on the robot: some fall poses leave the
+# head folded under as a third support, the centre of mass sits inside that
+# head+feet polygon, and the policy pushes until it stalls — a hand's nudge is what
+# escapes it. Speed/scale tuning cannot fix a support-polygon trap, so the pose is
+# seeded and the escape is trained.
+HEAD_PLANT_STAGES = [{"step": 0, "params": {"head_plant_prob": 0.10}},
+                     {"step": 8000, "params": {"head_plant_prob": 0.25}}]
+
+
+def make_microduck_headplant_hd1910_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
+    cfg = make_microduck_velstand_harsh_hd1910_env_cfg(play=play)
+
+    cfg.events["head_plant_init"] = EventTermCfg(
+        func=microduck_mdp.maybe_set_random_head_plant_orientation,
+        mode="reset",
+        params={"head_plant_prob": 0.10},
+    )
+    cfg.curriculum["head_plant_prob"] = CurriculumTermCfg(
+        func=microduck_mdp.event_param_curriculum,
+        params={"event_name": "head_plant_init", "param_stages": HEAD_PLANT_STAGES},
+    )
+    # The head is a support the policy must stop relying on: price its contact harder
+    # than the walk tasks do.
+    if "head_impact" in cfg.rewards:
+        cfg.rewards["head_impact"].weight = -0.05
     return cfg

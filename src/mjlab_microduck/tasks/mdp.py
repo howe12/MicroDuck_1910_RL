@@ -7419,3 +7419,68 @@ def no_turn_progress_penalty(
     shortfall = torch.clamp(1.0 - along / torch.clamp(cmd_abs, min=1e-6), 0.0, 1.0)
     active = (cmd_abs > command_deadzone).to(actual_w.dtype)
     return -(shortfall * active)
+
+
+def maybe_set_random_head_plant_orientation(
+    env: ManagerBasedRlEnv,
+    env_ids: torch.Tensor,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+    head_plant_prob: float = 0.0,
+    knee_fold: float = 1.2,
+    z_range: tuple[float, float] = (0.145, 0.175),
+):
+    """Reset a slice of envs into the "head takes the load" pose that stalls recovery.
+
+    Field report: the duck falls, folds its neck under so the head becomes a third
+    support, and the resulting head+feet polygon contains the centre of mass. Pushing
+    harder just presses the head down; a hand's nudge escapes it. That is a support
+    polygon problem, so it has to be trained, not tuned out.
+
+    The pose is constructed rather than discovered: face-down, neck folded toward its
+    stop (head tucked under the chin), knees folded so the feet stay close, and the
+    body lowered until the head bears weight. ``head_impact`` then prices the head
+    contact and ``recovery_success`` prices getting out of it.
+
+    Args:
+        head_plant_prob: exclusive slice of envs placed in this pose. 0 disables.
+        knee_fold: knee flexion that pulls the feet in under the body.
+        z_range: body height at reset, low enough that the head reaches the floor.
+    """
+    if head_plant_prob <= 0.0:
+        return
+    if env_ids is None:
+        env_ids = torch.arange(env.num_envs, device=env.device)
+    if len(env_ids) == 0:
+        return
+    env_ids = env_ids.to(env.device, dtype=torch.long)
+    u = torch.rand(len(env_ids), device=env.device)
+    selected = env_ids[u < head_plant_prob]
+    if len(selected) == 0:
+        return
+
+    num = len(selected)
+    asset: Entity = env.scene[asset_cfg.name]
+
+    # Face-down base orientation, then fold the neck so the head meets the floor.
+    set_random_prone_orientation(env, selected, asset_cfg=asset_cfg, face_down_prob=1.0)
+
+    joints = asset.data.default_joint_pos[selected].clone()
+    for name, value in (
+        ("neck_pitch", 1.05),
+        ("head_pitch", 0.55),
+        ("left_knee", -knee_fold),
+        ("right_knee", knee_fold),
+        ("left_ankle", 0.35),
+        ("right_ankle", -0.35),
+    ):
+        try:
+            ids, _ = asset.find_joints(f"^{name}$")
+        except Exception:
+            continue
+        if ids:
+            joints[:, ids[0]] = value
+
+    lo, hi = z_range
+    env.sim.data.qpos[selected, 2] = torch.rand(num, device=env.device) * (hi - lo) + lo
+    env.sim.data.qpos[selected, 7:] = joints
+    env.sim.data.qvel[selected, :] = 0.0
