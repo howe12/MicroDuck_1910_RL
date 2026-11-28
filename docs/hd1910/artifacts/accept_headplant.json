@@ -1,0 +1,182 @@
+{
+  "onnx": "policies/hd1910_headplant.onnx",
+  "results": [
+    {
+      "bucket": "stand",
+      "cmd": {
+        "vx": 0.0,
+        "vy": 0.0,
+        "wz": 0.0
+      },
+      "achieved_vx": 0.0,
+      "achieved_vy": 0.0,
+      "achieved_wz": 0.002,
+      "err_vx": 0.001,
+      "err_vy": 0.0,
+      "err_wz": 0.006,
+      "trunk_z_m": 0.116,
+      "air_time_mean_s": 0.0001,
+      "air_time_max_s": 0.0212,
+      "foot_height_min_m": -0.0011,
+      "tilt_deg": 0.8,
+      "fall_ratio": 0.0,
+      "_frames": [],
+      "verdict": "—"
+    },
+    {
+      "bucket": "fwd_slow",
+      "cmd": {
+        "vx": 0.15,
+        "vy": 0.0,
+        "wz": 0.0
+      },
+      "achieved_vx": 0.178,
+      "achieved_vy": -0.005,
+      "achieved_wz": 0.005,
+      "err_vx": 0.033,
+      "err_vy": 0.023,
+      "err_wz": 0.071,
+      "trunk_z_m": 0.116,
+      "air_time_mean_s": 0.0474,
+      "air_time_max_s": 0.0736,
+      "foot_height_min_m": -0.0007,
+      "tilt_deg": 2.0,
+      "fall_ratio": 0.0,
+      "_frames": [],
+      "verdict": "PASS"
+    },
+    {
+      "bucket": "fwd_fast",
+      "cmd": {
+        "vx": 0.4,
+        "vy": 0.0,
+        "wz": 0.0
+      },
+      "achieved_vx": 0.38,
+      "achieved_vy": 0.008,
+      "achieved_wz": 0.056,
+      "err_vx": 0.026,
+      "err_vy": 0.055,
+      "err_wz": 0.149,
+      "trunk_z_m": 0.117,
+      "air_time_mean_s": 0.0531,
+      "air_time_max_s": 0.0811,
+      "foot_height_min_m": -0.0011,
+      "tilt_deg": 2.9,
+      "fall_ratio": 0.0,
+      "_frames": [],
+      "verdict": "PASS"
+    },
+    {
+      "bucket": "back",
+      "cmd": {
+        "vx": -0.2,
+        "vy": 0.0,
+        "wz": 0.0
+      },
+      "achieved_vx": -0.222,
+      "achieved_vy": -0.005,
+      "achieved_wz": 0.1,
+      "err_vx": 0.034,
+      "err_vy": 0.045,
+      "err_wz": 0.105,
+      "trunk_z_m": 0.117,
+      "air_time_mean_s": 0.0508,
+      "air_time_max_s": 0.0725,
+      "foot_height_min_m": -0.0015,
+      "tilt_deg": 1.9,
+      "fall_ratio": 0.0,
+      "_frames": [],
+      "verdict": "PASS"
+    },
+    {
+      "bucket": "lat",
+      "cmd": {
+        "vx": 0.0,
+        "vy": 0.2,
+        "wz": 0.0
+      },
+      "achieved_vx": 0.007,
+      "achieved_vy": 0.154,
+      "achieved_wz": 0.017,
+      "err_vx": 0.008,
+      "err_vy": 0.085,
+      "err_wz": 0.053,
+      "trunk_z_m": 0.116,
+      "air_time_mean_s": 0.0486,
+      "air_time_max_s": 0.0872,
+      "foot_height_min_m": -0.0018,
+      "tilt_deg": 1.9,
+      "fall_ratio": 0.0,
+      "_frames": [],
+      "verdict": "PASS"
+    },
+    {
+      "bucket": "wz_slow",
+      "cmd": {
+        "vx": 0.0,
+        "vy": 0.0,
+        "wz": 0.3
+      },
+      "achieved_vx": 0.001,
+      "achieved_vy": -0.001,
+      "achieved_wz": 0.064,
+      "err_vx": 0.002,
+      "err_vy": 0.005,
+      "err_wz": 0.236,
+      "trunk_z_m": 0.115,
+      "air_time_mean_s": 0.0039,
+      "air_time_max_s": 0.0237,
+      "foot_height_min_m": -0.0016,
+      "tilt_deg": 0.9,
+      "fall_ratio": 0.0,
+      "_frames": [],
+      "verdict": "FAIL"
+    },
+    {
+      "bucket": "wz",
+      "cmd": {
+        "vx": 0.0,
+        "vy": 0.0,
+        "wz": 0.8
+      },
+      "achieved_vx": 0.005,
+      "achieved_vy": -0.004,
+      "achieved_wz": 0.991,
+      "err_vx": 0.006,
+      "err_vy": 0.061,
+      "err_wz": 0.207,
+      "trunk_z_m": 0.116,
+      "air_time_mean_s": 0.0525,
+      "air_time_max_s": 0.0723,
+      "foot_height_min_m": -0.0018,
+      "tilt_deg": 1.7,
+      "fall_ratio": 0.0,
+      "_frames": [],
+      "verdict": "PASS"
+    },
+    {
+      "bucket": "mix",
+      "cmd": {
+        "vx": 0.25,
+        "vy": 0.1,
+        "wz": 0.4
+      },
+      "achieved_vx": 0.253,
+      "achieved_vy": 0.088,
+      "achieved_wz": 0.647,
+      "err_vx": 0.017,
+      "err_vy": 0.07,
+      "err_wz": 0.258,
+      "trunk_z_m": 0.116,
+      "air_time_mean_s": 0.0516,
+      "air_time_max_s": 0.0912,
+      "foot_height_min_m": -0.0015,
+      "tilt_deg": 2.3,
+      "fall_ratio": 0.0,
+      "_frames": [],
+      "verdict": "—"
+    }
+  ],
+  "failed_checks": 1
+}
