@@ -17,8 +17,24 @@ from mjlab_microduck.tasks.microduck_velocity_env_cfg import (
 )
 
 
+def _pin_zero_command(cfg: ManagerBasedRlEnvCfg) -> ManagerBasedRlEnvCfg:
+    """Force a zero velocity command for the whole run.
+
+    A dance or a jump happens in place. Left on the walking task's random command
+    ranges the policy would be asked to dance *and* track a random velocity at the
+    same time - two objectives that disagree, so it would learn neither.
+    """
+    r = cfg.commands["twist"].ranges
+    r.lin_vel_x = (0.0, 0.0)
+    r.lin_vel_y = (0.0, 0.0)
+    r.ang_vel_z = (0.0, 0.0)
+    cfg.commands["twist"].heading_command = False
+    r.heading = None
+    return cfg
+
+
 def make_microduck_dance_hd1910_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
-    cfg = make_microduck_velocity_env_cfg(play=play)
+    cfg = _pin_zero_command(make_microduck_velocity_env_cfg(play=play))
 
     # Command is pinned to zero by the caller: a dance happens in place.
     cfg.rewards["dance_sway_nod"] = RewardTermCfg(
@@ -38,7 +54,7 @@ def make_microduck_dance_hd1910_env_cfg(play: bool = False) -> ManagerBasedRlEnv
 
 
 def make_microduck_jump_hd1910_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
-    cfg = make_microduck_velocity_env_cfg(play=play)
+    cfg = _pin_zero_command(make_microduck_velocity_env_cfg(play=play))
 
     cfg.rewards["jump_airborne"] = RewardTermCfg(
         func=microduck_mdp.jump_airborne_reward,
