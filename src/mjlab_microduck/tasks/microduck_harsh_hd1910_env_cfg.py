@@ -31,6 +31,7 @@ import dataclasses
 
 from mjlab.envs import ManagerBasedRlEnvCfg
 from mjlab.managers.curriculum_manager import CurriculumTermCfg
+from mjlab.managers.reward_manager import RewardTermCfg
 from mjlab.managers.event_manager import EventTermCfg
 from mjlab.utils.spec_config import CollisionCfg
 
@@ -105,4 +106,48 @@ def make_microduck_headplant_hd1910_env_cfg(play: bool = False) -> ManagerBasedR
     # than the walk tasks do.
     if "head_impact" in cfg.rewards:
         cfg.rewards["head_impact"].weight = -0.05
+    return cfg
+
+
+# Combined "gimbal-ish head + escape the headstand" task.
+#
+# Two goals that look contradictory but belong to different phases:
+#   * walking -> the camera should stop swinging (the head is a 36%-of-mass balance
+#     lever, and the policy currently uses it: measured camera 211 deg/s vs trunk
+#     54 deg/s, i.e. the head quadruples the motion)
+#   * fallen  -> the head MUST stay free to swing; escaping a headstand is done by
+#     trading angular momentum about the head contact
+# So the camera penalty is gated on uprightness (``upright_deg``), and the headstand
+# pose is seeded so the escape is trained at all.
+HEADSTAND_STAGES = [{"step": 0, "params": {"headstand_prob": 0.10}},
+                    {"step": 12000, "params": {"headstand_prob": 0.25}}]
+# Ramp the camera penalty instead of dropping it in: at full weight from step 0 the
+# gait collapses before it finds a leg-based balance strategy.
+CAMERA_PENALTY_STAGES = [{"step": 0, "weight": 0.0},
+                         {"step": 9600, "weight": -0.010},
+                         {"step": 24000, "weight": -0.030}]
+
+
+def make_microduck_gimbal_hd1910_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
+    cfg = make_microduck_headplant_hd1910_env_cfg(play=play)
+
+    cfg.events["headstand_init"] = EventTermCfg(
+        func=microduck_mdp.maybe_set_inverted_headstand,
+        mode="reset",
+        params={"headstand_prob": 0.10},
+    )
+    cfg.curriculum["headstand_prob"] = CurriculumTermCfg(
+        func=microduck_mdp.event_param_curriculum,
+        params={"event_name": "headstand_init", "param_stages": HEADSTAND_STAGES},
+    )
+
+    cfg.rewards["camera_ang_vel"] = RewardTermCfg(
+        func=microduck_mdp.camera_ang_vel_upright_penalty,
+        weight=-0.010,
+        params={"site_name": "head_camera", "upright_deg": 30.0},
+    )
+    cfg.curriculum["camera_ang_vel_weight"] = CurriculumTermCfg(
+        func=microduck_mdp.reward_weight,
+        params={"reward_name": "camera_ang_vel", "weight_stages": CAMERA_PENALTY_STAGES},
+    )
     return cfg

@@ -7484,3 +7484,100 @@ def maybe_set_random_head_plant_orientation(
     env.sim.data.qpos[selected, 2] = torch.rand(num, device=env.device) * (hi - lo) + lo
     env.sim.data.qpos[selected, 7:] = joints
     env.sim.data.qvel[selected, :] = 0.0
+
+
+def camera_ang_vel_upright_penalty(
+    env: ManagerBasedRlEnv,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+    site_name: str = "head_camera",
+    upright_deg: float = 30.0,
+) -> torch.Tensor:
+    """World-frame camera angular velocity, gated to the upright phase.
+
+    Returns a non-negative value (use a negative weight). The gate matters: head
+    motion has to stay free while the robot is fallen, because escaping a fall is
+    exactly when swinging the head/legs is the only way out. Penalising it there
+    would fight the recovery skill. Above ``upright_deg`` of tilt the gate is 0.
+    """
+    asset: Entity = env.scene[asset_cfg.name]
+    ids, _ = asset.find_sites(f"^{site_name}$")
+    if not ids:
+        return torch.zeros(env.num_envs, device=env.device)
+    w = asset.data.site_ang_vel_w[:, ids[0]]
+    g = asset.data.projected_gravity_b
+    tilt = torch.acos(torch.clamp(-g[:, 2], -1.0, 1.0))
+    gate = (tilt < math.radians(upright_deg)).float()
+    return gate * (w * w).sum(dim=-1)
+
+
+def maybe_set_inverted_headstand(
+    env: ManagerBasedRlEnv,
+    env_ids: torch.Tensor,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+    headstand_prob: float = 0.0,
+    pitch_deg: tuple[float, float] = (100.0, 135.0),
+    z_range: tuple[float, float] = (0.18, 0.22),
+):
+    """Reset a slice into the "balanced on the head, feet in the air" pose.
+
+    Field report (photo + logs): the duck ends up with its head jammed into the
+    floor and both feet off the ground, trunk past horizontal (tilt 81-117 deg).
+    That is a different problem from a face-down prone reset: the feet have no
+    contact, so no leg can push. The only escapes are a leg swing that trades
+    angular momentum about the head (a kip-up) or toppling sideways to gain a
+    second contact.
+
+    ``set_random_prone_orientation`` cannot express this: it is a fixed +-90 deg
+    pitch dropped from a height, so it topples flat before the policy ever acts.
+    Here the body is placed *past* vertical and held there, legs extended (feet
+    in the air), neck reaching for the floor, so the episode starts inside the
+    trap.
+
+    Args:
+        headstand_prob: exclusive slice of envs placed here.
+        pitch_deg: trunk pitch past vertical; 90 is exactly head-down.
+        z_range: trunk-origin height. Lower keeps the head in contact.
+    """
+    if headstand_prob <= 0.0:
+        return
+    if env_ids is None:
+        env_ids = torch.arange(env.num_envs, device=env.device)
+    if len(env_ids) == 0:
+        return
+    env_ids = env_ids.to(env.device, dtype=torch.long)
+    u = torch.rand(len(env_ids), device=env.device)
+    selected = env_ids[u < headstand_prob]
+    if len(selected) == 0:
+        return
+
+    num = len(selected)
+    asset: Entity = env.scene[asset_cfg.name]
+
+    pitch = torch.rand(num, device=env.device) * (
+        math.radians(pitch_deg[1]) - math.radians(pitch_deg[0])) + math.radians(pitch_deg[0])
+    yaw = torch.rand(num, device=env.device) * 2 * math.pi - math.pi
+    cw, sw = torch.cos(yaw * 0.5), torch.sin(yaw * 0.5)
+    cp, sp = torch.cos(pitch * 0.5), torch.sin(pitch * 0.5)
+    # q = yaw about z, then pitch about y
+    quat = torch.stack([cw * cp, -sw * sp, cw * sp, sw * cp], dim=1)
+
+    # Legs extended so the feet are up in the air rather than tucked under the body.
+    joints = asset.data.default_joint_pos[selected].clone()
+    for name, value in (
+        ("left_knee", 0.05), ("right_knee", -0.05),
+        ("left_ankle", 0.10), ("right_ankle", -0.10),
+        ("left_hip_pitch", -0.10), ("right_hip_pitch", 0.10),
+        ("neck_pitch", 0.60), ("head_pitch", 0.30),
+    ):
+        try:
+            ids, _ = asset.find_joints(f"^{name}$")
+        except Exception:
+            continue
+        if ids:
+            joints[:, ids[0]] = value
+
+    lo, hi = z_range
+    env.sim.data.qpos[selected, 2] = torch.rand(num, device=env.device) * (hi - lo) + lo
+    env.sim.data.qpos[selected, 3:7] = quat
+    env.sim.data.qpos[selected, 7:] = joints
+    env.sim.data.qvel[selected, :] = 0.0

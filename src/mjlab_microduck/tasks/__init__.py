@@ -36,6 +36,7 @@ from .microduck_velocity_hd1910_env_cfg import (
 from .microduck_harsh_hd1910_env_cfg import (
     make_microduck_velstand_harsh_hd1910_env_cfg,
     make_microduck_headplant_hd1910_env_cfg,
+    make_microduck_gimbal_hd1910_env_cfg,
 )
 from .microduck_tricks_hd1910_env_cfg import MicroduckVelStandHd1910RlCfg as _HarshRlCfg
 
@@ -162,6 +163,15 @@ register_mjlab_task(
     play_env_cfg=make_microduck_headplant_hd1910_env_cfg(play=True),
     rl_cfg=dataclasses.replace(_HarshRlCfg, experiment_name="headplant_hd1910",
                                run_name="headplant_hd1910"),
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+register_mjlab_task(
+    task_id="Mjlab-Gimbal-MicroDuck-HD1910",
+    env_cfg=make_microduck_gimbal_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_gimbal_hd1910_env_cfg(play=True),
+    rl_cfg=dataclasses.replace(_HarshRlCfg, experiment_name="gimbal_hd1910",
+                               run_name="gimbal_hd1910"),
     runner_cls=MicroduckOnPolicyRunner,
 )
 
