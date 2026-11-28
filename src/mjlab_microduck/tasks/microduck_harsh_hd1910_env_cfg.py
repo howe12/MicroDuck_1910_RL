@@ -151,3 +151,34 @@ def make_microduck_gimbal_hd1910_env_cfg(play: bool = False) -> ManagerBasedRlEn
         params={"reward_name": "camera_ang_vel", "weight_stages": CAMERA_PENALTY_STAGES},
     )
     return cfg
+
+
+# "Recover from anything" task.
+#
+# Every past recovery failure produced a one-off fix: face-up added, then side-lying,
+# then head-plant. The pattern is the problem - the pose space is continuous and
+# enumerating it will always miss the next one. This task keeps a uniform SO(3) slice
+# (all orientations, legs randomised) alongside the named poses, so unseen poses are
+# inside the distribution instead of outside it.
+FALLEN_STAGES = [{"step": 0, "params": {"fallen_prob": 0.15}},
+                 {"step": 12000, "params": {"fallen_prob": 0.30}}]
+
+
+def make_microduck_allfall_hd1910_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
+    cfg = make_microduck_headplant_hd1910_env_cfg(play=play)
+
+    cfg.events["random_fallen_init"] = EventTermCfg(
+        func=microduck_mdp.maybe_set_random_fallen_pose,
+        mode="reset",
+        params={"fallen_prob": 0.15, "z_range": (0.16, 0.20), "joint_noise": 0.6},
+    )
+    cfg.curriculum["fallen_prob"] = CurriculumTermCfg(
+        func=microduck_mdp.event_param_curriculum,
+        params={"event_name": "random_fallen_init", "param_stages": FALLEN_STAGES},
+    )
+    cfg.events["side_lying_init"] = EventTermCfg(
+        func=microduck_mdp.maybe_set_side_lying,
+        mode="reset",
+        params={"side_prob": 0.10, "roll_deg": (60.0, 120.0), "z_range": (0.075, 0.105)},
+    )
+    return cfg

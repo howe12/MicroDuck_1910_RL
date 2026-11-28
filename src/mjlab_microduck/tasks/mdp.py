@@ -7581,3 +7581,226 @@ def maybe_set_inverted_headstand(
     env.sim.data.qpos[selected, 3:7] = quat
     env.sim.data.qpos[selected, 7:] = joints
     env.sim.data.qvel[selected, :] = 0.0
+
+
+def maybe_set_side_lying(
+    env: ManagerBasedRlEnv,
+    env_ids: torch.Tensor,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+    side_prob: float = 0.0,
+    roll_deg: tuple[float, float] = (60.0, 120.0),
+    z_range: tuple[float, float] = (0.075, 0.105),
+):
+    """Reset a slice lying on one side (roll about the trunk's forward axis).
+
+    Why this is not ``set_random_ground_state``: that helper's face-up branch drops
+    the body from 0.20-0.25 m, and calling it outside the env's own reset event
+    leaves the body penetrating the floor (observed trunk z down to -96 mm), which
+    makes any recovery number meaningless. This writes the pose the same way the
+    working head-plant reset does: small clearance, zero velocity, next step settles.
+
+    Side-lying is a genuine gap in the training distribution: the reset events cover
+    face-down, face-up, sitting, standing, crouch and (now) head-plant, but never a
+    body rolled onto its flank - which is exactly what the field photo and the
+    ``tilt 81-117 deg`` log entries show.
+
+    Args:
+        side_prob: exclusive slice of envs placed on their side.
+        roll_deg: roll magnitude; the sign alternates so both flanks are covered.
+        z_range: trunk-origin height. Low enough to settle onto the flank quickly.
+    """
+    if side_prob <= 0.0:
+        return
+    if env_ids is None:
+        env_ids = torch.arange(env.num_envs, device=env.device)
+    if len(env_ids) == 0:
+        return
+    env_ids = env_ids.to(env.device, dtype=torch.long)
+    u = torch.rand(len(env_ids), device=env.device)
+    selected = env_ids[u < side_prob]
+    if len(selected) == 0:
+        return
+
+    num = len(selected)
+    asset: Entity = env.scene[asset_cfg.name]
+
+    mag = torch.rand(num, device=env.device) * (
+        math.radians(roll_deg[1]) - math.radians(roll_deg[0])) + math.radians(roll_deg[0])
+    sign = torch.where(torch.rand(num, device=env.device) < 0.5, 1.0, -1.0)
+    roll = mag * sign
+    yaw = torch.rand(num, device=env.device) * 2 * math.pi - math.pi
+    cy, sy = torch.cos(yaw * 0.5), torch.sin(yaw * 0.5)
+    cr, sr = torch.cos(roll * 0.5), torch.sin(roll * 0.5)
+    # q = yaw about z, then roll about x
+    quat = torch.stack([cy * cr, cy * sr, sy * sr, sy * cr], dim=1)
+
+    joints = asset.data.default_joint_pos[selected].clone()
+    for name, value in (
+        ("left_knee", -0.35), ("right_knee", 0.35),
+        ("left_ankle", 0.15), ("right_ankle", -0.15),
+        ("neck_pitch", 0.10), ("head_pitch", 0.05),
+    ):
+        try:
+            ids, _ = asset.find_joints(f"^{name}$")
+        except Exception:
+            continue
+        if ids:
+            joints[:, ids[0]] = value
+
+    lo, hi = z_range
+    env.sim.data.qpos[selected, 2] = torch.rand(num, device=env.device) * (hi - lo) + lo
+    env.sim.data.qpos[selected, 3:7] = quat
+    env.sim.data.qpos[selected, 7:] = joints
+    env.sim.data.qvel[selected, :] = 0.0
+
+
+def maybe_set_random_fallen_pose(
+    env: ManagerBasedRlEnv,
+    env_ids: torch.Tensor,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+    fallen_prob: float = 0.0,
+    z_range: tuple[float, float] = (0.16, 0.20),
+    joint_noise: float = 0.6,
+):
+    """Reset a slice into a uniformly random orientation over SO(3), legs splayed at random.
+
+    Field history is a sequence of one-off fixes: face-up was added after a fall,
+    then side-lying, then head-plant. Each time the policy failed on a pose nobody
+    had thought to enumerate. Enumerating is the wrong shape of solution - the pose
+    space is continuous, so the distribution should be too.
+
+    A uniform random quaternion (normalised 4-D Gaussian is uniform on SO(3)) plus
+    randomised joint angles covers prone, supine, both flanks, head-down, inverted,
+    legs-crossed and everything between, without naming any of them.
+
+    Height: kept just above the floor rather than dropped. A large drop makes the
+    first contact violent and the body punches through the ground (observed trunk z
+    down to -96 mm when calling ``set_random_ground_state`` outside the env's own
+    reset), which turns any recovery measurement into noise.
+
+    Args:
+        fallen_prob: exclusive slice of envs placed in a random fallen pose.
+        z_range: trunk-origin height range. High enough to clear the head and legs
+            in any orientation, low enough that the settle is gentle.
+        joint_noise: fraction of each joint's range used to randomise its start.
+    """
+    if fallen_prob <= 0.0:
+        return
+    if env_ids is None:
+        env_ids = torch.arange(env.num_envs, device=env.device)
+    if len(env_ids) == 0:
+        return
+    env_ids = env_ids.to(env.device, dtype=torch.long)
+    u = torch.rand(len(env_ids), device=env.device)
+    selected = env_ids[u < fallen_prob]
+    if len(selected) == 0:
+        return
+
+    num = len(selected)
+    asset: Entity = env.scene[asset_cfg.name]
+
+    # Uniform random rotation: normalise an isotropic 4-D Gaussian.
+    q = torch.randn(num, 4, device=env.device)
+    quat = q / q.norm(dim=1, keepdim=True).clamp_min(1e-6)
+
+    # Random leg/neck configuration so the same orientation is not always the same shape.
+    home = asset.data.default_joint_pos[selected].clone()
+    span = home.abs() * joint_noise + 0.25 * joint_noise
+    joints = home + (torch.rand_like(home) * 2 - 1) * span
+
+    lo, hi = z_range
+    env.sim.data.qpos[selected, 2] = torch.rand(num, device=env.device) * (hi - lo) + lo
+    env.sim.data.qpos[selected, 3:7] = quat
+    env.sim.data.qpos[selected, 7:] = joints
+    env.sim.data.qvel[selected, :] = 0.0
+
+
+def _episode_time(env: ManagerBasedRlEnv) -> torch.Tensor:
+    """Seconds since the current episode started, per env."""
+    return env.episode_length_buf.float() * env.step_dt
+
+
+def dance_sway_nod_reward(
+    env: ManagerBasedRlEnv,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+    sway_amp_rad: float = 0.16,
+    sway_hz: float = 0.45,
+    nod_amp_rad: float = 0.28,
+    nod_hz: float = 0.9,
+) -> torch.Tensor:
+    """Track a left-right body sway plus a head nod, both as sinusoids of episode time.
+
+    The choreography is deliberately *in the reward*, not in the policy's inputs: the
+    observation contract is fixed at 61 numbers with no clock, so the policy has to
+    learn the rhythm as a self-sustaining limit cycle. Resetting the phase with the
+    episode is what makes that learnable - every episode starts on the beat.
+
+    Cute rather than acrobatic on purpose: a wide, slow roll reads as a happy sway,
+    and a nod twice the sway frequency reads as bobbing along. Fast or large motions
+    would drift into a fall, which is not what a dance slot should risk.
+    """
+    asset: Entity = env.scene[asset_cfg.name]
+    t = _episode_time(env)
+
+    # Body roll about the forward axis, from the trunk quaternion (ZYX roll).
+    q = asset.data.root_link_quat_w
+    w, x, y, z = q[:, 0], q[:, 1], q[:, 2], q[:, 3]
+    roll = torch.atan2(2.0 * (w * x + y * z), 1.0 - 2.0 * (x * x + y * y))
+    roll_target = sway_amp_rad * torch.sin(2 * math.pi * sway_hz * t)
+
+    # Head nod on the neck pitch joint.
+    ids, _ = asset.find_joints("^neck_pitch$")
+    nod = asset.data.joint_pos[:, ids[0]] if ids else torch.zeros_like(roll)
+    nod_target = asset.data.default_joint_pos[:, ids[0]].mean() if ids else 0.0
+    nod_target = nod_target + nod_amp_rad * torch.sin(2 * math.pi * nod_hz * t)
+
+    sway_err = (roll - roll_target) ** 2
+    nod_err = (nod - nod_target) ** 2
+    # Exponential shaping keeps the gradient useful near the target instead of
+    # collapsing to a constant once the error is small.
+    return torch.exp(-8.0 * sway_err) + 0.7 * torch.exp(-6.0 * nod_err)
+
+
+def jump_airborne_reward(
+    env: ManagerBasedRlEnv,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+    base_height: float = 0.115,
+    foot_clear_m: float = 0.02,
+) -> torch.Tensor:
+    """Reward height gained above the standing pose while both feet are off the ground.
+
+    Honest expectation: the leg Jacobian at the best crouch is ~0.079 m/rad and the
+    servos turn a few rad/s, so takeoff velocity tops out near 0.3-0.4 m/s, i.e. a
+    hop of roughly 5-10 mm. This term exists to let the optimiser find whatever the
+    real ceiling is, not because a big jump is available - the reward scales with
+    height so a taller solution is strictly preferred if one exists.
+    """
+    asset: Entity = env.scene[asset_cfg.name]
+    z = asset.data.root_link_pos_w[:, 2]
+    gained = torch.clamp(z - base_height, min=0.0)
+
+    feet = []
+    for side in ("left", "right"):
+        ids, _ = asset.find_sites(f"^{side}_foot$")
+        if ids:
+            feet.append(asset.data.site_pos_w[:, ids[0], 2])
+    if len(feet) == 2:
+        airborne = ((feet[0] > foot_clear_m) & (feet[1] > foot_clear_m)).float()
+    else:
+        airborne = torch.zeros_like(gained)
+    return gained * (0.3 + airborne)
+
+
+def upright_hold_reward(
+    env: ManagerBasedRlEnv,
+    asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+    base_height: float = 0.10,
+) -> torch.Tensor:
+    """Landing quality: stay tall and level, so a hop ends standing rather than falling."""
+    asset: Entity = env.scene[asset_cfg.name]
+    g = asset.data.projected_gravity_b
+    tilt = torch.acos(torch.clamp(-g[:, 2], -1.0, 1.0))
+    z = asset.data.root_link_pos_w[:, 2]
+    tall = torch.clamp((z - base_height) / 0.03, 0.0, 1.0)
+    level = torch.exp(-6.0 * tilt * tilt)
+    return tall * level

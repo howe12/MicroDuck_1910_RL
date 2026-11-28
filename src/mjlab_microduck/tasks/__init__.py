@@ -37,6 +37,11 @@ from .microduck_harsh_hd1910_env_cfg import (
     make_microduck_velstand_harsh_hd1910_env_cfg,
     make_microduck_headplant_hd1910_env_cfg,
     make_microduck_gimbal_hd1910_env_cfg,
+    make_microduck_allfall_hd1910_env_cfg,
+)
+from .microduck_fun_hd1910_env_cfg import (
+    make_microduck_dance_hd1910_env_cfg,
+    make_microduck_jump_hd1910_env_cfg,
 )
 from .microduck_tricks_hd1910_env_cfg import MicroduckVelStandHd1910RlCfg as _HarshRlCfg
 
@@ -53,6 +58,10 @@ from .microduck_skills_hd1910_env_cfg import (
 from .microduck_terrain_hd1910_env_cfg import (
     make_microduck_velocity_slope_hd1910_env_cfg,
     MicroduckHd1910SlopeRlCfg,
+)
+from .microduck_fun_hd1910_env_cfg import (
+    make_microduck_dance_hd1910_env_cfg,
+    make_microduck_jump_hd1910_env_cfg,
 )
 from .microduck_tricks_hd1910_env_cfg import (
     make_microduck_roulade_hd1910_env_cfg,
@@ -172,6 +181,33 @@ register_mjlab_task(
     play_env_cfg=make_microduck_gimbal_hd1910_env_cfg(play=True),
     rl_cfg=dataclasses.replace(_HarshRlCfg, experiment_name="gimbal_hd1910",
                                run_name="gimbal_hd1910"),
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+register_mjlab_task(
+    task_id="Mjlab-AllFall-MicroDuck-HD1910",
+    env_cfg=make_microduck_allfall_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_allfall_hd1910_env_cfg(play=True),
+    rl_cfg=dataclasses.replace(_HarshRlCfg, experiment_name="allfall_hd1910",
+                               run_name="allfall_hd1910"),
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+register_mjlab_task(
+    task_id="Mjlab-Dance-MicroDuck-HD1910",
+    env_cfg=make_microduck_dance_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_dance_hd1910_env_cfg(play=True),
+    rl_cfg=dataclasses.replace(_HarshRlCfg, experiment_name="dance_hd1910",
+                               run_name="dance_hd1910"),
+    runner_cls=MicroduckOnPolicyRunner,
+)
+
+register_mjlab_task(
+    task_id="Mjlab-Jump-MicroDuck-HD1910",
+    env_cfg=make_microduck_jump_hd1910_env_cfg(),
+    play_env_cfg=make_microduck_jump_hd1910_env_cfg(play=True),
+    rl_cfg=dataclasses.replace(_HarshRlCfg, experiment_name="jump_hd1910",
+                               run_name="jump_hd1910"),
     runner_cls=MicroduckOnPolicyRunner,
 )
 
